@@ -5,7 +5,7 @@ class App(FastAPI):
     ...
 
 app = App(
-    title="UnWrap",
+    title="UnWrapp",
     description="Get your spotify unwrapped any time of the year(You can modify it too!)"
 )
 
