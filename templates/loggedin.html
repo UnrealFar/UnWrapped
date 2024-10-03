@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <title>Logged In</title>
+</head>
+<body>
+    <script>
+        const user = {
+            id: "{{ user.id }}",
+            spotify_id: "{{ user.spotify_id }}",
+            country: "{{ user.country }}",
+            display_name: "{{ user.display_name }}",
+            email: "{{ user.email }}",
+            follower_count: "{{ user.follower_count }}",
+            uri: "{{ user.uri }}",
+            image: "{{ user.image }}",
+            product: "{{ user.product }}"
+        };
+
+        for (const [key, value] of Object.entries(user)) {
+            localStorage.setItem(key, value);
+        }
+
+        window.location.href = "/profile";
+    </script>
+</body>
+</html>
+
+

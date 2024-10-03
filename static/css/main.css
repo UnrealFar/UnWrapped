@@ -1,3 +1,45 @@
 body {
     font-family: Arial, sans-serif;
+    background-color: black;
+    color: white;
+}
+
+#navbar {
+    background-color: black;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#navbar #navButtons {
+    display: flex;
+    margin-left: auto;
+}
+
+#navbar #profileButtons #profileImage {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+button {
+    background-color: #1DB954;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 20px;
+    cursor: finger;
+    display: inline-block;
+}
+
+button:hover {
+    background-color: #14833b;
+}
+
+h1 {
+    color: #1DB954;
 }
