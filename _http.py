@@ -1,4 +1,4 @@
-from typing import Dict, List, TYPE_CHECKING
+from typing import Any, Dict, List, Tuple, TYPE_CHECKING
 import aiohttp
 import datetime
 import pytz
@@ -20,11 +20,11 @@ class HTTP:
         
         self.user_playlists: Dict[str, List[Playlist]] = {}
 
-    async def request(self, method: str, url: str, **kwargs) -> Dict:
+    async def request(self, method: str, url: str, **kwargs) -> Dict[str, Any]:
         async with self.session.request(method, url, **kwargs) as response:
             return await response.json()
 
-    async def refresh_token(self, user):
+    async def refresh_token(self, user) -> None:
         url = "https://accounts.spotify.com/api/token"
         data = await self.request(
             "POST",
@@ -42,7 +42,7 @@ class HTTP:
         user.token_expires = datetime.datetime.now(pytz.utc) + datetime.timedelta(seconds=data["expires_in"])
         await user.save()
 
-    async def get_user_data(self, code: str):
+    async def get_user_data(self, code: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         url = "https://accounts.spotify.com/api/token"
         data = await self.request(
             "POST",
@@ -57,7 +57,6 @@ class HTTP:
                 "Authorization": self.client.auth_header,
             },
         )
-        print(data)
         access_token = data["access_token"]
         token_type = data["token_type"]
         
@@ -71,7 +70,7 @@ class HTTP:
         )
         return user_data, data
 
-    async def get_or_create_user(self, user_data, token_data):
+    async def get_or_create_user(self, user_data, token_data) -> User:
         access_token = token_data["access_token"]
         expires_in = token_data["expires_in"]
         refresh_token = token_data["refresh_token"]
