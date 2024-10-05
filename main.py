@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.sessions import SessionMiddleware
 import time
 import os
 import random
@@ -42,7 +43,7 @@ class Client:
             db_url=os.getenv("POSTGRES_URL"),
             modules={"models": ["models"]},
         )
-        #sql = ...
+        #sql = 'ALTER TABLE "user" ALTER COLUMN "key" SET NOT NULL;'
         #await Tortoise.get_connection("default").execute_script(sql)
         #in case you need to run some sql script
 
@@ -84,6 +85,8 @@ client = Client(
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY"))
+
 @app.get("/")
 async def root(request: Request):
     return templates.TemplateResponse(
@@ -98,28 +101,43 @@ async def profile(request: Request):
 
 @app.get("/playlists")
 async def playlists(request: Request, refresh: bool = False):
-    spotify_id = request.session.get("spotify_id")
+    key = request.session.get("key")
+    if not key:
+        return RedirectResponse("/login")
+    try:
+        user = await User.get(key=key)
+    except User.DoesNotExist:
+        return RedirectResponse("/login")
     if refresh or not client.http.user_playlists:
-        playlists = await client.http.get_playlists(request.user, offset=0, limit=20)
-        client.http.user_playlists[request.user.spotify_id] = playlists
+        playlists = await client.http.get_playlists(user, offset=0, limit=20)
+        client.http.user_playlists[user.spotify_id] = playlists
     else:
-        playlists = client.http.user_playlists[request.user.spotify_id]
+        playlists = client.http.user_playlists[user.spotify_id]
     return templates.TemplateResponse(
         "playlists.html", {"request": request}
     )
 
 @app.get("/load_more_playlists")
 async def load_more_playlists(request: Request, offset: int):
-    playlists = await client.http.get_playlists(request.user, offset=offset, limit=20)
-    client.http.user_playlists[request.user.spotify_id].extend(playlists)
+    key = request.session.get("key")
+    try:
+        user = await User.get(key=key)
+    except User.DoesNotExist:
+        return RedirectResponse("/login")
+    playlists = await client.http.get_playlists(user, offset=offset, limit=20)
+    client.http.user_playlists[user.spotify_id].extend(playlists)
     return templates.TemplateResponse(
-        "playlists.html", {"request": request}
+        "playlists.html", {"request": request, "playlists": playlists}
     )
 
 @app.get("/top_tracks")
 async def top(request: Request, type: str = "medium_term"):
-
-    tracks = await client.http.get_top_tracks(request.user, type=type)
+    key = request.session.get("key")
+    try:
+        user = await User.get(key=key)
+    except User.DoesNotExist:
+        return RedirectResponse("/login")
+    tracks = await client.http.get_top_tracks(user, type=type)
     return templates.TemplateResponse(
         "top_tracks.html", {"request": request, tracks: tracks}
     )
@@ -151,7 +169,7 @@ async def callback(
     
     user_data, token_data = await client.http.get_user_data(code)
     user = await client.http.get_or_create_user(user_data, token_data)
-    request.session["spotify_id"] = user.spotify_id
+    request.session["key"] = user.key
     
     return templates.TemplateResponse("loggedin.html", {"request": request, "user": user})
 

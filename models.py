@@ -4,6 +4,7 @@ from typing import List, Dict
 
 class User(Model):
     id = fields.BigIntField(pk=True, generated=True)
+    key = fields.CharField(max_length=512, null=True)
     spotify_id = fields.CharField(max_length=255)
     country = fields.CharField(max_length=255, null=True)
     display_name = fields.CharField(max_length=255, null=True)

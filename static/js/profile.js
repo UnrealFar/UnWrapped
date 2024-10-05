@@ -12,13 +12,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Populate the HTML elements with the user data
     document.getElementById("display_name").textContent = "@" + user.display_name;
-    document.getElementById("spotify_id").textContent = user.spotify_id;
-    document.getElementById("country").textContent = user.country;
-    document.getElementById("follower_count").textContent = user.follower_count;
-    var uri = "https://open.spotify.com/user/" + user.spotify_id;
-    document.getElementById("sp_profile_url").onclick = function() {window.open(uri);};
-    document.getElementById("product").textContent = user.product;
-    document.getElementById("image").src = user.image;
+    // document.getElementById("spotify_id").textContent = user.spotify_id;
+    // document.getElementById("country").textContent = user.country;
+    // document.getElementById("follower_count").textContent = user.follower_count;
+    var url = "https://open.spotify.com/user/" + user.spotify_id;
+    document.getElementById("sp_profile_url").onclick = function() {window.open(url);};
+    // document.getElementById("product").textContent = user.product;
+    // document.getElementById("image").src = user.image;
 
     // Log out button functionality
     document.getElementById("logout").addEventListener("click", function() {

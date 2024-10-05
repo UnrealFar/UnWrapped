@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Tuple, TYPE_CHECKING
 import aiohttp
-import asyncio
+import bcrypt
 import datetime
 import pytz
 import tortoise
@@ -93,6 +93,7 @@ class HTTP:
                 image=user_data["images"][0]["url"],
                 country=user_data["country"],
                 product=user_data["product"],
+                key=bcrypt.hashpw(user_data["id"].encode(), bcrypt.gensalt()).decode(),
             )
         else:
             user.access_token = access_token
