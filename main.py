@@ -72,7 +72,6 @@ client = Client(
         'playlist-modify-public',
         'playlist-modify-private',
         'playlist-read-private',
-        'playlist-read-collaborative',
         'user-read-email',
         'user-read-private',
         'user-read-playback-state',
