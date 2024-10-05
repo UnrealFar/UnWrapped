@@ -38,3 +38,30 @@ class Playlist:
     track_count: int
     uri: str
 
+
+@dataclass
+class Artist:
+    id: str
+    name: str
+    uri: str
+
+@dataclass
+class Album:
+    id: str
+    name: str
+    artists: List[Artist]
+    image: str
+    uri: str
+
+@dataclass
+class Track:
+    id: str
+    name: str
+    artists: List[Artist]
+    album: Album
+    duration_ms: int
+    popularity: int
+    explicit: bool
+    uri: str
+
+

@@ -8,7 +8,7 @@ import random
 import base64
 import datetime
 import asyncio
-import tortoise
+import aiohttp
 import pytz
 from tortoise import Tortoise
 from dotenv import load_dotenv
@@ -46,8 +46,9 @@ class Client:
         #await Tortoise.get_connection("default").execute_script(sql)
         #in case you need to run some sql script
 
-
         await Tortoise.generate_schemas()
+
+        self.http.session = aiohttp.ClientSession()
 
         for user in await User.all():
             asyncio.create_task(self.refresh_task(user))
@@ -96,10 +97,31 @@ async def profile(request: Request):
     )
 
 @app.get("/playlists")
-async def playlists(request: Request):
-    playlists = await client.http.get_playlists()
+async def playlists(request: Request, refresh: bool = False):
+    spotify_id = request.session.get("spotify_id")
+    if refresh or not client.http.user_playlists:
+        playlists = await client.http.get_playlists(request.user, offset=0, limit=20)
+        client.http.user_playlists[request.user.spotify_id] = playlists
+    else:
+        playlists = client.http.user_playlists[request.user.spotify_id]
     return templates.TemplateResponse(
         "playlists.html", {"request": request}
+    )
+
+@app.get("/load_more_playlists")
+async def load_more_playlists(request: Request, offset: int):
+    playlists = await client.http.get_playlists(request.user, offset=offset, limit=20)
+    client.http.user_playlists[request.user.spotify_id].extend(playlists)
+    return templates.TemplateResponse(
+        "playlists.html", {"request": request}
+    )
+
+@app.get("/top_tracks")
+async def top(request: Request, type: str = "medium_term"):
+
+    tracks = await client.http.get_top_tracks(request.user, type=type)
+    return templates.TemplateResponse(
+        "top_tracks.html", {"request": request, tracks: tracks}
     )
 
 @app.get("/login")
@@ -129,6 +151,7 @@ async def callback(
     
     user_data, token_data = await client.http.get_user_data(code)
     user = await client.http.get_or_create_user(user_data, token_data)
+    request.session["spotify_id"] = user.spotify_id
     
     return templates.TemplateResponse("loggedin.html", {"request": request, "user": user})
 

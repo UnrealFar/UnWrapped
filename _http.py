@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from typing import Any, Dict, List, Tuple, TYPE_CHECKING
 import aiohttp
+import asyncio
 import datetime
 import pytz
 import tortoise
@@ -12,11 +15,12 @@ if TYPE_CHECKING:
     from main import Client
 
 class HTTP:
-    client: "Client"
+    client: Client
+    session: aiohttp.ClientSession
     
-    def __init__(self, client):
+    def __init__(self, client: Client):
         self.client = client
-        self.session = aiohttp.ClientSession()
+        self.session = None
         
         self.user_playlists: Dict[str, List[Playlist]] = {}
 
@@ -148,6 +152,19 @@ class HTTP:
         self.user_playlists[user.spotify_id] = playlists
         return playlists
 
+    async def get_top_tracks(self, user: User, type: str = "medium_term") -> List[str]:
+        url = f"https://api.spotify.com/v1/me/top/tracks"
+        data = await self.request(
+            "GET",
+            url,
+            headers={
+                "Authorization": f"Bearer {user.access_token}",
+            },
+            params={
+                "time_range": type,
+            },
+        )
+        tracks = []
 
     async def close(self):
         await self.session.close()

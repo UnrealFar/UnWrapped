@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function() {
         <div id="navbar">
             <button id="homeButton" onclick="window.location.href='/'">UnWrapped</button>
             <div id="navButtons">
+                <!-- <button id="playlistsButton" onclick="window.location.href='/playlists'">Playlists</button> -->
                 <button id="profileButton" onclick="window.location.href='/profile'">
                     <img id="profileImage" src="" alt="Profile Image" style="width: 20px; height: 20px; border-radius: 50%; margin-right: 5px;">
                     Profile
