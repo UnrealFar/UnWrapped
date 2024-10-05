@@ -1,3 +1,5 @@
+/* Secondary Black: #121313 */
+
 body {
     font-family: Arial, sans-serif;
     background-color: black;
@@ -42,4 +44,44 @@ button:hover {
 
 h1 {
     color: #1DB954;
+    line-height: 1.2;
+    letter-spacing: normal;
+}
+
+/* Typewriter effect */
+
+.typewriter {
+    font-family: monospace;
+    white-space: pre-wrap;
+    line-height: 1.2;
+    letter-spacing: normal;
+}
+
+.cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background-color: black;
+    animation: blink 0.5s step-end infinite;
+}
+
+@keyframes blink {
+    from, to {
+        background-color: transparent;
+    }
+    50% {
+        background-color: black;
+    }
+}
+
+/* Footer styles */
+#footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #111;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 14px;
 }

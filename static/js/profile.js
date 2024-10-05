@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("country").textContent = user.country;
     document.getElementById("follower_count").textContent = user.follower_count;
     var uri = "https://open.spotify.com/user/" + user.spotify_id;
-    document.getElementById("uri").href = uri;
+    document.getElementById("sp_profile_url").onclick = function() {window.open(uri);};
     document.getElementById("product").textContent = user.product;
     document.getElementById("image").src = user.image;
 

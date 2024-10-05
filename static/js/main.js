@@ -42,6 +42,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
     document.getElementById("logoutButton").addEventListener("click", function() {
         localStorage.clear();
-        window.location.href = "/login";
+        window.location.href = "/";
     });
+
+    var footer = document.createElement("footer");
+    footer.id = "footer";
+    footer.innerHTML = "Made by Farhan";
+    document.body.appendChild(footer);
+
 });
