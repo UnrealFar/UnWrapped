@@ -4,7 +4,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
     nav.innerHTML = `
         <div id="navbar">
-            <button id="homeButton" onclick="window.location.href='/'">UnWrapped</button>
+            <button id="homeButton" onclick="window.location.href='/'">
+                UnWrapped
+                <!-- <img src="/static/logo/Rectangle Logo.png" alt="Logo" style="height:10;width:70;"> -->
+            </button>
             <div id="navButtons">
                 <!-- <button id="playlistsButton" onclick="window.location.href='/playlists'">Playlists</button> -->
                 <div id="profileButtonContainer">

@@ -137,6 +137,14 @@ async def root(request: Request, user: User = get_user):
         "index.html", {"request": request, "user": user}
     )
 
+@app.get("/favicon.ico")
+async def favicon():
+    file_path = f"static/logo/Circle Logo.png"
+    headers = {
+        #"Cache-Control": "public, max-age=31536000"
+    }
+    return FileResponse(file_path, headers=headers)
+
 @app.get("/profile")
 async def profile(request: Request, user: User = get_user):
     if not user:
