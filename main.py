@@ -67,7 +67,7 @@ class Client:
 
 app = App(
     title="UnWrapped",
-    description="Get your spotify unwrapped any time of the year(You can modify it too!)",
+    description="Get your Spotify Wrapped and other stats any time of the year!",
 )
 client = Client(
     os.getenv("CLIENT_ID"), os.getenv("CLIENT_SECRET"),
