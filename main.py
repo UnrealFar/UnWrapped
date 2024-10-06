@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, Depends
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, FileResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
@@ -52,7 +52,7 @@ class Client:
 
         await Tortoise.generate_schemas()
 
-        self.http.session = aiohttp.ClientSession()
+        await self.http.setup()
 
         for user in await User.all():
             asyncio.create_task(self.refresh_task(user))
@@ -87,6 +87,14 @@ client = Client(
 
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/static/fonts/{font_name}")
+async def get_font(font_name: str):
+    file_path = f"static/fonts/{font_name}"
+    headers = {
+        "Cache-Control": "public, max-age=31536000"
+    }
+    return FileResponse(file_path, headers=headers)
 
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY"))
 

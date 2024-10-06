@@ -23,6 +23,6 @@ document.addEventListener("DOMContentLoaded", function() {
     // Log out button functionality
     document.getElementById("logout").addEventListener("click", function() {
         localStorage.clear();
-        window.location.href = "/login";
+        window.location.href = "/";
     });
 });

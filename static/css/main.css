@@ -1,13 +1,21 @@
 /* Secondary Black: #121313 */
 
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: black;
+@font-face {
+    font-family: 'Gotham Bold';
+    src: url('/static/fonts/Gotham-Bold.otf') format('opentype');
+}
+
+html, body {
+    font-family: 'Gotham Bold', sans-serif;
+    height: 100%;
+    background: linear-gradient(to bottom, #322463, #000000);
     color: white;
+    margin: 0;
+    overflow: hidden; /* Prevent scrolling */
 }
 
 #navbar {
-    background-color: black;
+    background-color: inherit;
     padding: 10px;
     border-radius: 10px;
     display: flex;
@@ -28,52 +36,24 @@ body {
 }
 
 button {
-    background-color: #1DB954;
+    background-color: #14833b;
     color: white;
     border: none;
     font: inherit;
     padding: 10px 20px;
     margin: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
     border-radius: 15px;
-    cursor: finger;
+    cursor: pointer;
     display: inline-block;
 }
 
 button:hover {
-    background-color: #14833b;
+    background-color: #0f5d2a;
 }
 
-h1 {
-    color: #1DB954;
-    line-height: 1.2;
-    letter-spacing: normal;
-}
 
-/* Typewriter effect */
-
-.typewriter {
-    font-family: monospace;
-    white-space: pre-wrap;
-    line-height: 1.2;
-    letter-spacing: normal;
-}
-
-.cursor {
-    display: inline-block;
-    width: 2px;
-    height: 1em;
-    background-color: black;
-    animation: blink 0.5s step-end infinite;
-}
-
-@keyframes blink {
-    from, to {
-        background-color: transparent;
-    }
-    50% {
-        background-color: black;
-    }
-}
 
 /* Footer styles */
 #footer {
@@ -85,4 +65,44 @@ h1 {
     text-align: center;
     padding: 10px 0;
     font-size: 14px;
+}
+
+@media (max-width: 600px) {
+    html, body {
+        font-size: 14px;
+        overflow: auto; /* Allow scrolling on mobile */
+    }
+
+    #navbar {
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    #navbar #navButtons {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+
+    button {
+        padding: 8px 16px;
+        margin: 5px 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .card {
+        width: 90%;
+        margin: 10px auto;
+        padding: 15px;
+    }
+
+    .cardRow {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #footer {
+        font-size: 12px;
+        padding: 8px 0;
+    }
 }

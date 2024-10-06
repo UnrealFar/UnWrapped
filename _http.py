@@ -6,6 +6,7 @@ import bcrypt
 import datetime
 import pytz
 import tortoise
+import logging
 from models import (
     User,
     Playlist,
@@ -24,9 +25,20 @@ class HTTP:
         
         self.user_playlists: Dict[str, List[Playlist]] = {}
 
-    async def request(self, method: str, url: str, **kwargs) -> Dict[str, Any]:
+    async def setup(self):
+        self.session = aiohttp.ClientSession()
+
+    async def close(self):
+        if self.session:
+            await self.session.close()
+
+    async def request(self, method, url, **kwargs):
+        if not self.session:
+            logging.error("HTTP session is not initialized")
+            raise RuntimeError("HTTP session is not initialized")
         async with self.session.request(method, url, **kwargs) as response:
             return await response.json()
+
 
     async def refresh_token(self, user) -> None:
         url = "https://accounts.spotify.com/api/token"

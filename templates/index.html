@@ -2,6 +2,17 @@
 <html lang="en-GB">
 <head>
     <title>UnWrapped | Home</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="og:title" content="UnWrapped | Get your Spotify wrapped and stats!">
+    <meta name="og:description" content="Get your spotify wrapped and other stats at any time of the year.">
+    <meta name="og:url" content="https://un-wrapped.vercel.app">
+    <meta name="keywords" content="spotify, wrapped, stats, music, top tracks, top artists">
+    <meta name="author" content="Farhan Ahmed">
+    <meta name="robots" content="index, follow">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+    <meta name="theme-color" content="#1DB954">
     <link rel="stylesheet" type="text/css" href="static/css/main.css">
     <link rel="stylesheet" type="text/css" href="static/css/index.css">
 </head>
@@ -14,6 +25,20 @@
             <div class="typewriter" id="twtxt1" style="visibility: hidden;"></div>
         </span>
     </h1>
+
+    <div class="cardRow">
+        <div class="card" id="card0">
+            <h2>Your top songs</h2>
+            <p>View your top songs listened</p>
+            <button id="topTracks">View</button>
+        </div>
+        <div class="card" id="card1">
+            <h2>Your top arists</h2>
+            <p>View your top artists</p>
+            <button id="playlists">View</button>
+        </div>
+    </div>
+
     <script src="static/js/main.js"></script>
     <script src="static/js/typewriter.js"></script>
 </body>

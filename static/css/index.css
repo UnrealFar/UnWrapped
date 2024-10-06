@@ -3,3 +3,55 @@ body {
     text-align: center;
 }
 
+h1 {
+    top: 10%;
+    color: #1DB954;
+    line-height: 1.5;
+    letter-spacing: normal;
+    z-index: 10; /* Ensure typewriter text is above the cards */
+}
+
+/* Typewriter effect */
+
+.typewriter {
+    font-family: inherit;
+    white-space: pre-wrap;
+    line-height: 1.2;
+    letter-spacing: normal;
+}
+
+.cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background-color: black;
+    animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+    from, to {
+        background-color: transparent;
+    }
+    50% {
+        background-color: black;
+    }
+}
+
+.cardRow {
+    display: none;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+    z-index: 5,
+}
+
+.card {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 10px;
+    text-align: center;
+    width: 300px;
+}

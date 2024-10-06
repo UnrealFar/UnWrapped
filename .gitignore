@@ -5,3 +5,4 @@ __pycache__/
 *.log
 *.bat
 genschema.py
+*.zip
