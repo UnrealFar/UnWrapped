@@ -34,8 +34,7 @@ class HTTP:
 
     async def request(self, method, url, **kwargs):
         if not self.session:
-            logging.error("HTTP session is not initialized")
-            raise RuntimeError("HTTP session is not initialized")
+            self.session = aiohttp.ClientSession()
         async with self.session.request(method, url, **kwargs) as response:
             return await response.json()
 
