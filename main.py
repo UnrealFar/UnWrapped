@@ -1,8 +1,9 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
+from itsdangerous import URLSafeSerializer
 import time
 import os
 import random
@@ -11,6 +12,7 @@ import datetime
 import asyncio
 import aiohttp
 import pytz
+import cachetools
 from tortoise import Tortoise
 from dotenv import load_dotenv
 
@@ -37,6 +39,7 @@ class Client:
         self.scope = " ".join(scopes)
         self.states = []
         self.http = HTTP(self)
+        self.serializer = URLSafeSerializer(os.getenv("SECRET_KEY"),salt=os.getenv("SECRET_SALT").encode())
 
     async def setup(self):
         await Tortoise.init(
@@ -87,6 +90,39 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY"))
 
+def sign_data(data):
+    return client.serializer.dumps(data)
+
+def unsign_data(data) -> str:
+    return client.serializer.loads(data)
+
+user_cache = cachetools.TTLCache(maxsize=100, ttl=30)
+
+
+async def get_cached_user(key: str) -> User:
+    try:
+        return user_cache[key]
+    except KeyError:
+        user = await User.get(key=key)
+        user_cache[key] = user
+        return user
+
+async def _get_user(request: Request) -> User| None:
+    try:
+        key = unsign_data(request.session.get("key"))
+    except:
+        request.session.pop("key", None)
+        return None
+    if not key:
+        return None
+    try:
+        user = await get_cached_user(key)
+    except User.DoesNotExist:
+        return None
+    return user
+
+get_user = Depends(_get_user)
+
 @app.get("/")
 async def root(request: Request):
     return templates.TemplateResponse(
@@ -94,19 +130,16 @@ async def root(request: Request):
     )
 
 @app.get("/profile")
-async def profile(request: Request):
+async def profile(request: Request, user: User = get_user):
+    if not user:
+        return RedirectResponse("/login")
     return templates.TemplateResponse(
         "profile.html", {"request": request}
     )
 
 @app.get("/playlists")
-async def playlists(request: Request, refresh: bool = False):
-    key = request.session.get("key")
-    if not key:
-        return RedirectResponse("/login")
-    try:
-        user = await User.get(key=key)
-    except User.DoesNotExist:
+async def playlists(request: Request, refresh: bool = False, user: User = get_user):
+    if not user:
         return RedirectResponse("/login")
     if refresh or not client.http.user_playlists:
         playlists = await client.http.get_playlists(user, offset=0, limit=20)
@@ -118,11 +151,8 @@ async def playlists(request: Request, refresh: bool = False):
     )
 
 @app.get("/load_more_playlists")
-async def load_more_playlists(request: Request, offset: int):
-    key = request.session.get("key")
-    try:
-        user = await User.get(key=key)
-    except User.DoesNotExist:
+async def load_more_playlists(request: Request, offset: int, user: User = get_user):
+    if not user:
         return RedirectResponse("/login")
     playlists = await client.http.get_playlists(user, offset=offset, limit=20)
     client.http.user_playlists[user.spotify_id].extend(playlists)
@@ -131,15 +161,13 @@ async def load_more_playlists(request: Request, offset: int):
     )
 
 @app.get("/top_tracks")
-async def top(request: Request, type: str = "medium_term"):
-    key = request.session.get("key")
-    try:
-        user = await User.get(key=key)
-    except User.DoesNotExist:
+async def top(request: Request, type: str = "medium_term", user: User = get_user):
+    if not user:
         return RedirectResponse("/login")
+
     tracks = await client.http.get_top_tracks(user, type=type)
     return templates.TemplateResponse(
-        "top_tracks.html", {"request": request, tracks: tracks}
+        "top_tracks.html", {"request": request, "tracks": tracks, "type": type}
     )
 
 @app.get("/login")
@@ -164,12 +192,17 @@ async def callback(
     error: str = None,
 ):
     if error:
-        client.states.remove(state)
+        try:
+            client.states.remove(state)
+        except ValueError:
+            return RedirectResponse("/login")
+    if state not in client.states:
         return RedirectResponse("/login")
     
     user_data, token_data = await client.http.get_user_data(code)
     user = await client.http.get_or_create_user(user_data, token_data)
-    request.session["key"] = user.key
+    user_cache[user.key] = user
+    request.session["key"] = sign_data(user.key)
     
     return templates.TemplateResponse("loggedin.html", {"request": request, "user": user})
 
