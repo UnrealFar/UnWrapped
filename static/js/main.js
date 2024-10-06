@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
-    var loggedIn = localStorage.getItem("id");
+    var spotifyID = localStorage.getItem("spotify_id");
     var nav = document.querySelector("nav");
 
     nav.innerHTML = `
@@ -7,21 +7,24 @@ document.addEventListener("DOMContentLoaded", function() {
             <button id="homeButton" onclick="window.location.href='/'">UnWrapped</button>
             <div id="navButtons">
                 <!-- <button id="playlistsButton" onclick="window.location.href='/playlists'">Playlists</button> -->
-                <button id="profileButton" onclick="window.location.href='/profile'">
-                    <img id="profileImage" src="" alt="Profile Image" style="width: 20px; height: 20px; border-radius: 50%; margin-right: 5px;">
-                    Profile
-                </button>
-                <button id="loginButton">Log In</button>
-                <button id="logoutButton">Log Out</button>
+                <div id="profileButtonContainer">
+                    <button id="profileButton" style="display:none;">
+                        <img id="profileImage" src="" alt="Profile Image" style="height:70;width:70;">
+                    </button>
+                    <div id="dropdownMenu" class="dropdown-content">
+                        <a href="/profile">View Profile</a>
+                        <a href="https://open.spotify.com/user/${spotifyID}" target="_blank">Open in Spotify</a>
+                        <a href="#" id="logoutLink">Logout</a>
+                    </div>
+                </div>
+                <button id="loginButton" style="display:none;">Log In</button>
             </div>
         </div>
     `;
 
-    if (loggedIn != null && loggedIn != "null") {
+    if (spotifyID != null && spotifyID != "null") {
         var loginButton = document.getElementById("loginButton");
         loginButton.style.display = "none";
-        var logoutButton = document.getElementById("logoutButton");
-        logoutButton.style.display = "block";
         var profileButton = document.getElementById("profileButton");
         profileButton.style.display = "block";
         var profileImage = document.getElementById("profileImage");
@@ -29,26 +32,38 @@ document.addEventListener("DOMContentLoaded", function() {
     } else {
         var loginButton = document.getElementById("loginButton");
         loginButton.style.display = "block";
-        var logoutButton = document.getElementById("logoutButton");
-        logoutButton.style.display = "none";
         var profileButton = document.getElementById("profileButton");
         profileButton.style.display = "none";
     }
-
-
 
     document.getElementById("loginButton").addEventListener("click", function() {
         window.location.href = "/login";
     });
 
-    document.getElementById("logoutButton").addEventListener("click", function() {
+    document.getElementById("logoutLink").addEventListener("click", function() {
         localStorage.clear();
         window.location.href = "/logout";
     });
+
+    document.getElementById("profileButton").addEventListener("click", function() {
+        var dropdownMenu = document.getElementById("dropdownMenu");
+        dropdownMenu.classList.toggle("show");
+    });
+
+    window.onclick = function(event) {
+        if (!event.target.matches('#profileButton') && !event.target.matches('#profileButton img')) {
+            var dropdowns = document.getElementsByClassName("dropdown-content");
+            for (var i = 0; i < dropdowns.length; i++) {
+                var openDropdown = dropdowns[i];
+                if (openDropdown.classList.contains('show')) {
+                    openDropdown.classList.remove('show');
+                }
+            }
+        }
+    };
 
     var footer = document.createElement("footer");
     footer.id = "footer";
     footer.innerHTML = "Made by Farhan";
     document.body.appendChild(footer);
-
 });

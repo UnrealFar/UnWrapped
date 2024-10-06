@@ -20,9 +20,4 @@ document.addEventListener("DOMContentLoaded", function() {
     // document.getElementById("product").textContent = user.product;
     // document.getElementById("image").src = user.image;
 
-    // Log out button functionality
-    document.getElementById("logout").addEventListener("click", function() {
-        localStorage.clear();
-        window.location.href = "/logout";
-    });
 });
