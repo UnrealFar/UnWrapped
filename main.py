@@ -96,6 +96,14 @@ async def get_font(font_name: str):
     }
     return FileResponse(file_path, headers=headers)
 
+@app.get("/static/logo/{logo_name}")
+async def get_logo(logo_name: str):
+    file_path = f"static/logo/{logo_name}"
+    headers = {
+        "Cache-Control": "public, max-age=1000"
+    }
+    return FileResponse(file_path, headers=headers)
+
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY"))
 
 def sign_data(data):
@@ -144,6 +152,7 @@ async def favicon():
         #"Cache-Control": "public, max-age=31536000"
     }
     return FileResponse(file_path, headers=headers)
+
 
 @app.get("/profile")
 async def profile(request: Request, user: User = get_user):
