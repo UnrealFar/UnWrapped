@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function() {
     nav.innerHTML = `
         <div id="navbar">
             <button id="homeButton" onclick="window.location.href='/'">
-                <img src="/static/logo/Rectangle Logo.png" alt="Logo">
+                <img src="/static/logo/LogoRectangle.png" alt="Logo">
             </button>
             <div id="navButtons">
                 <!-- <button id="playlistsButton" onclick="window.location.href='/playlists'">Playlists</button> -->
