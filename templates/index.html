@@ -18,13 +18,16 @@
 </head>
 <body>
     <nav></nav>
-    <h1>
-        <br>
-        <div class="typewriter" id="twtxt0" style="visibility: hidden;"></div>
-        <span style="font-size: 2em;">
-            <div class="typewriter" id="twtxt1" style="visibility: hidden;"></div>
-        </span>
-    </h1>
+    {% if not user %}
+        <h1>
+            <br>
+            <div class="typewriter" id="twtxt0" style="visibility: hidden;"></div>
+            <span style="font-size: 2em;">
+                <div class="typewriter" id="twtxt1" style="visibility: hidden;"></div>
+            </span>
+        </h1>
+        <button id="loginButton" onclick="window.location.href='/login'">Login with Spotify</button>
+    {% endif %}
 
     <div class="cardRow">
         <div class="card" id="card0">

@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     document.getElementById("logoutButton").addEventListener("click", function() {
         localStorage.clear();
-        window.location.href = "/";
+        window.location.href = "/logout";
     });
 
     var footer = document.createElement("footer");

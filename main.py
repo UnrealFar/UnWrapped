@@ -132,9 +132,9 @@ async def _get_user(request: Request) -> User| None:
 get_user = Depends(_get_user)
 
 @app.get("/")
-async def root(request: Request):
+async def root(request: Request, user: User = get_user):
     return templates.TemplateResponse(
-        "index.html", {"request": request}
+        "index.html", {"request": request, "user": user}
     )
 
 @app.get("/profile")
@@ -214,6 +214,10 @@ async def callback(
     
     return templates.TemplateResponse("loggedin.html", {"request": request, "user": user})
 
+@app.get("/logout")
+async def logout(request: Request):
+    request.session.pop("key", None)
+    return RedirectResponse("/")
 
 async def startup():
     await client.setup()
