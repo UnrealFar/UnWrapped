@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-GB">
 <head>
-    <title>UnWrapped | Home</title>
+    <title>UnWrapped | Top Tracks</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="og:title" content="UnWrapped | Your Top Tracks!">
@@ -18,24 +18,123 @@
 </head>
 <body>
     <nav></nav>
-    <div class="cardColumn">
-    {% set index = 0 %}
-    {% for track in tracks %}
-    
-        <div class="card" id="card{{ index }}">
-            {% set index = index + 1 %}
-            <h2>#{{ index }}</h2>
-            <img src="{{ track.album.image }}" alt="{{ track.name }}" class="cardImage">
-            <span class="cardSpan">
-                <h3>{{ track.name }}</h3>
-                <p>{{ track.artists[0].name }}</p>
-                <p>{{ track.album.name }}</p>
-            </span>
-        </div>
+    <h1>Your Top Tracks</h1>
+    <form id="timeRangeForm">
+        <label for="timeRangeSelect">Select Time Range: </label>
+        <select id="timeRangeSelect" name="type" onchange="document.getElementById('timeRangeForm').submit()">
+            <option value="short_term" {% if type == 'short_term' %}selected{% endif %}>Past 1 Month</option>
+            <option value="medium_term" {% if type == 'medium_term' %}selected{% endif %}>Past 6 Months</option>
+            <option value="long_term" {% if type == 'long_term' %}selected{% endif %}>Past Year</option>
+        </select>
+    </form>
+    <h2>
+        {% if type == 'short_term' %}
+            Based on your listening history over the past 1 month.
+        {% elif type == 'medium_term' %}
+            Based on your listening history over the past 6 months.
+        {% elif type == 'long_term' %}
+            Based on your listening history over the past year.
+        {% else %}
+            Based on your listening history over the past 1 month.
+        {% endif %}
+    </h2>
 
+    <div id="cardColumn"></div>
+    <button id="loadMoreButton">Load More...</button>
+    <br><br><br><br><br>
 
-    {% endfor %}
-    </div>
     <script src="static/js/main.js"></script>
+    <script>
+        console.log('Script loaded');
+    
+        let page = 0;
+        let isLoading = false;
+        const cardColumn = document.getElementById('cardColumn');
+        const loadMoreButton = document.getElementById('loadMoreButton');
+        const type = '{{ type }}';
+    
+        console.log('Type:', type);
+    
+        function cacheData(key, data) {
+            const cache = {
+                timestamp: Date.now(),
+                data: data
+            };
+            localStorage.setItem(key, JSON.stringify(cache));
+        }
+    
+        function getCachedData(key) {
+            const cache = JSON.parse(localStorage.getItem(key));
+            if (cache && (Date.now() - cache.timestamp < 60000)) {
+                return cache.data;
+            }
+            return null;
+        }
+    
+        async function loadMoreTracks() {
+            if (isLoading) return;
+            isLoading = true;
+            console.log('Loading more tracks...');
+            const cacheKey = `tracks_${type}_page_${page}`;
+            const cachedData = getCachedData(cacheKey);
+    
+            if (cachedData) {
+                console.log('Using cached data for page', page);
+                appendTracks(cachedData);
+                isLoading = false;
+            } else {
+                try {
+                    console.log('Fetching data for page', page);
+                    const response = await fetch(`/load_more_toptracks?type=${type}&page=${page}`);
+                    console.log('Fetch URL:', `/load_more_toptracks?type=${type}&page=${page}`);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const data = await response.json();
+                    if (data.tracks) {
+                        const parsedTracks = data.tracks.map(track => JSON.parse(track));
+                        cacheData(cacheKey, parsedTracks);
+                        appendTracks(parsedTracks);
+                    } else {
+                        console.error('No tracks found in response:', data);
+                    }
+                } catch (error) {
+                    console.error('Error loading more tracks:', error);
+                } finally {
+                    isLoading = false;
+                }
+            }
+            page++;
+        }
+    
+        function appendTracks(tracks) {
+            tracks.forEach((track, index) => {
+                const albumImage = track.album?.image || 'default_image_url';
+                const artistNames = track.artists?.map(artist => `<a href="https://open.spotify.com/artist/${artist.id}" target="_blank">${artist.name}</a>`).join(', ') || 'Unknown Artist';
+                const albumName = track.album ? `<a href="https://open.spotify.com/album/${track.album.id}" target="_blank">${track.album.name}</a>` : 'Unknown Album';
+                const spotifyUrl = `https://open.spotify.com/track/${track.id}`;
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.id = `card${page * 20 + index + 1}`;
+                card.innerHTML = `
+                    <h2>#${page * 20 + index + 1}</h2>
+                    <img src="${albumImage}" alt="${track.name}" class="cardImage" loading="lazy">
+                    <span class="cardSpan">
+                        <h3><a href="${spotifyUrl}" target="_blank">${track.name}</a></h3>
+                        <p>${artistNames}</p>
+                    </span>
+                    <p>${albumName}</p>
+                    <p>${Math.floor(track.duration_ms / 60000)}:${Math.floor((track.duration_ms % 60000) / 1000)}</p>
+                `;
+                cardColumn.appendChild(card);
+            });
+        }
+    
+        loadMoreButton.addEventListener('click', () => {
+            loadMoreTracks();
+        });
+    
+        loadMoreTracks();
+    </script>
 </body>
 </html>

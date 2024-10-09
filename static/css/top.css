@@ -1,44 +1,95 @@
-
 html, body {
-    background: linear-gradient(to bottom, #6128ac, #1d1d1d, 90%);
+    background: linear-gradient(to bottom, #7244ad, #1d1d1d, 90%);
 }
 
 .cardColumn {
-    background: linear-gradient(to bottom, #6128ac, #1d1d1d, 90%);
-    display: none;
-    position: relative;
+    background: linear-gradient(to bottom, #6932b0, #1d1d1d, 10%);
     display: flex;
+    align-items: center;
     flex-direction: column;
-    justify-content: left;
+    justify-content: flex-start;
     margin-top: 50px;
-    z-index: 5,
+    z-index: 5;
 }
 
 .card {
     background: none;
-    border: white;
+    border: 1px solid white;
     border-radius: 10px;
-    padding: 2px;
+    padding: 10px;
     margin: 10px;
     text-align: left;
-    max-width: 80%;
-    height: 55px;
+    width: 95%;
+    height: auto;
     display: flex;
+    flex-direction: row;
     align-items: center;
+}
+
+.headerCard {
+    font-weight: bold;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .card img {
     width: 50px;
     height: 50px;
+    margin-left: 10px;
+    margin-right: 10px;
     cursor: pointer;
     display: block;
     border-radius: 2px;
 }
 
-#cardSpan {
-    font-size: 10px;
+
+.cardSpan {
     color: white;
     margin-left: 10px;
-    line-height: 0.5;
+    line-height: 0.8;
+    flex: 1;
 }
 
+.card h2 {
+    margin-right: 10px;
+    font-size: 2em;
+}
+
+.card h3 {
+    margin-left: 10px;
+    margin-right: 10px;
+    font-size: 1.5em;
+}
+
+.card p {
+    margin-left: 10px;
+    color: #b0b0b0;
+    font-size: 1em;
+}
+
+.card a {
+    color: #b0b0b0;
+    text-decoration: none;
+}
+
+.card a:hover {
+    color: white;
+}
+
+#timeRangeSelect {
+    position: absolute;
+    background-color: #200000;
+    color: white;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.23);
+    z-index: 1;
+    border-radius: 2px;
+}
+
+#timeRangeSelect option {
+    background-color: #121212;
+    color: white;
+}
+
+#timeRangeSelect:hover {
+    border-color: #14833b;
+}

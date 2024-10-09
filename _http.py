@@ -168,7 +168,12 @@ class HTTP:
         self.user_playlists[user.spotify_id] = playlists
         return playlists
 
-    async def get_top_tracks(self, user: User, type: str = "medium_term") -> List[str]:
+    async def get_top_tracks(
+            self, user: User,
+            type: str = "short_term",
+            offset: int = 0,
+            limit: int = 20
+    ) -> List[Track]:
         url = f"https://api.spotify.com/v1/me/top/tracks"
         data = await self.request(
             "GET",
@@ -178,6 +183,8 @@ class HTTP:
             },
             params={
                 "time_range": type,
+                "offset": offset,
+                "limit": limit,
             },
         )
         tracks = []

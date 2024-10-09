@@ -1,6 +1,16 @@
 from tortoise import Model, fields
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from typing import List, Dict
+import json
+
+class DataclassEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if hasattr(obj, '__dataclass_fields__'):
+            return asdict(obj)
+        return super().default(obj)
+
+def dc_dumps(obj):
+    return json.dumps(obj, cls=DataclassEncoder)
 
 class User(Model):
     id = fields.BigIntField(pk=True, generated=True)

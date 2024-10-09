@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, Depends
-from fastapi.responses import RedirectResponse, FileResponse
+from fastapi.responses import RedirectResponse, FileResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
@@ -17,7 +17,7 @@ from tortoise import Tortoise
 from dotenv import load_dotenv
 
 
-from models import User
+from models import User, dc_dumps
 from _http import HTTP
 
 load_dotenv()
@@ -192,15 +192,21 @@ async def load_more_playlists(request: Request, offset: int, user: User = get_us
     )
 
 @app.get("/toptracks")
-async def top(request: Request, type: str = "medium_term", user: User = get_user):
+async def top(request: Request, type: str = "short_term", user: User = get_user):
     if not user:
         return RedirectResponse("/login")
-
-    tracks = await client.http.get_top_tracks(user, type=type)
-    tracks.sort(key=lambda x: x.popularity, reverse=True)
     return templates.TemplateResponse(
-        "top_tracks.html", {"request": request, "tracks": tracks, "type": type}
+        "top_tracks.html", {"request":request, "type":type}
     )
+
+@app.get('/load_more_toptracks')
+async def load_more_toptracks(request: Request, page:int, type: str = "short_term", user: User = get_user):
+    if not user:
+        return RedirectResponse("/login")
+    offset = page * 20
+    tracks = await client.http.get_top_tracks(user, type=type, offset=offset)
+    tracks.sort(key=lambda x: x.popularity, reverse=True)
+    return JSONResponse({"tracks": [dc_dumps(track) for track in tracks]})
 
 @app.get("/login")
 async def login(
