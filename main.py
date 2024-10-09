@@ -41,20 +41,32 @@ class Client:
         self.http = HTTP(self)
         self.serializer = URLSafeSerializer(os.getenv("SECRET_KEY"),salt=os.getenv("SECRET_SALT").encode())
 
+    async def retry_db_connection(self, retries=3, delay=5):
+        for _ in range(retries):
+            try:
+                await Tortoise.init(
+                    db_url=os.getenv("POSTGRES_URL"),
+                    modules={"models": ["models"]},
+                    use_tz=True,
+                )
+                await Tortoise.generate_schemas()
+                break
+            except Exception as e:
+                print(f"DB connection failed: {e}, retrying...")
+                await asyncio.sleep(delay)
+
     async def setup(self):
-        await Tortoise.init(
-            db_url=os.getenv("POSTGRES_URL"),
-            modules={"models": ["models"]},
-        )
+        await self.retry_db_connection()
+    
         #sql = 'ALTER TABLE "user" ALTER COLUMN "key" SET NOT NULL;'
         #await Tortoise.get_connection("default").execute_script(sql)
         #in case you need to run some sql script
 
-        await Tortoise.generate_schemas()
-
         await self.http.setup()
+        uc = 0
 
         for user in await User.all():
+            uc += 1
             asyncio.create_task(self.refresh_task(user))
 
 
