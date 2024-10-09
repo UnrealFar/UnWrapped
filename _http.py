@@ -10,6 +10,9 @@ import logging
 from models import (
     User,
     Playlist,
+    Track,
+    Artist,
+    Album,
 )
 
 if TYPE_CHECKING:
@@ -31,6 +34,7 @@ class HTTP:
     async def close(self):
         if self.session:
             await self.session.close()
+
 
     async def request(self, method, url, **kwargs):
         if not self.session:
@@ -177,6 +181,25 @@ class HTTP:
             },
         )
         tracks = []
+        for item in data["items"]:
+            track = Track(
+                id=item["id"],
+                name=item["name"],
+                artists=[Artist(id=artist["id"], name=artist["name"], uri=artist["uri"]) for artist in item["artists"]],
+                album=Album(
+                    id=item["album"]["id"],
+                    name=item["album"]["name"],
+                    artists=[Artist(id=artist["id"], name=artist["name"], uri=artist["uri"]) for artist in item["album"]["artists"]],
+                    image=item["album"]["images"][0]["url"],
+                    uri=item["album"]["uri"],
+                ),
+                duration_ms=item["duration_ms"],
+                popularity=item["popularity"],
+                explicit=item["explicit"],
+                uri=item["uri"],
+            )
+            tracks.append(track)
+        return tracks
 
     async def close(self):
         await self.session.close()

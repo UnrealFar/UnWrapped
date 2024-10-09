@@ -104,6 +104,12 @@ async def get_logo(logo_name: str):
     }
     return FileResponse(file_path, headers=headers)
 
+@app.get("/privacy_policy")
+async def toc(request: Request):
+    return templates.TemplateResponse(
+        "priv_pol.html", {"request": request}
+    )
+
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY"))
 
 def sign_data(data):
@@ -185,12 +191,13 @@ async def load_more_playlists(request: Request, offset: int, user: User = get_us
         "playlists.html", {"request": request, "playlists": playlists}
     )
 
-@app.get("/top_tracks")
+@app.get("/toptracks")
 async def top(request: Request, type: str = "medium_term", user: User = get_user):
     if not user:
         return RedirectResponse("/login")
 
     tracks = await client.http.get_top_tracks(user, type=type)
+    tracks.sort(key=lambda x: x.popularity, reverse=True)
     return templates.TemplateResponse(
         "top_tracks.html", {"request": request, "tracks": tracks, "type": type}
     )
@@ -240,6 +247,7 @@ async def startup():
     await client.setup()
 
 async def shutdown():
+    await Tortoise.close_connections()
     await client.http.close()
 
 app.add_event_handler("startup", startup)

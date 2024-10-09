@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en-GB">
 <head>
-    <title>UnWrapped | Your Top Tracks</title>
     <title>UnWrapped | Home</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,10 +14,28 @@
     <meta name="bingbot" content="index, follow">
     <meta name="theme-color" content="#1DB954">
     <link rel="stylesheet" type="text/css" href="static/css/main.css">
-    <link rel="stylesheet" type="text/css" href="static/css/index.css">
+    <link rel="stylesheet" type="text/css" href="static/css/top.css">
 </head>
 <body>
     <nav></nav>
+    <div class="cardColumn">
+    {% set index = 0 %}
+    {% for track in tracks %}
+    
+        <div class="card" id="card{{ index }}">
+            {% set index = index + 1 %}
+            <h2>#{{ index }}</h2>
+            <img src="{{ track.album.image }}" alt="{{ track.name }}" class="cardImage">
+            <span class="cardSpan">
+                <h3>{{ track.name }}</h3>
+                <p>{{ track.artists[0].name }}</p>
+                <p>{{ track.album.name }}</p>
+            </span>
+        </div>
+
+
+    {% endfor %}
+    </div>
     <script src="static/js/main.js"></script>
 </body>
 </html>
