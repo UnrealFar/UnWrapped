@@ -12,7 +12,7 @@ html, body {
     color: white;
     margin: 0;
     text-align: center;
-    overflow: hidden; /* Prevent scrolling */
+    overflow: auto;
 }
 
 #navbar {
