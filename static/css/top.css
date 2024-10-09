@@ -76,7 +76,6 @@ html, body {
 }
 
 #timeRangeSelect {
-    position: absolute;
     background-color: #200000;
     color: white;
     min-width: 160px;
