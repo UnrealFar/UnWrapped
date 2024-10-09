@@ -250,7 +250,11 @@ async def logout(request: Request):
     return RedirectResponse("/")
 
 async def startup():
-    await client.setup()
+    try:
+        await client.setup()
+    except Exception as e:
+        print(f"Error during startup: {e}")
+        raise e
 
 async def shutdown():
     await Tortoise.close_connections()
