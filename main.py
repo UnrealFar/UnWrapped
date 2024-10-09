@@ -10,7 +10,7 @@ import random
 import base64
 import datetime
 import asyncio
-import aiohttp
+import traceback
 import pytz
 import cachetools
 from tortoise import Tortoise
@@ -257,7 +257,7 @@ async def callback(
         
         return templates.TemplateResponse("loggedin.html", {"request": request, "user": user})
     except Exception as e:
-        return str(e)
+        return {"error": str(e), "traceback": traceback.format_exc()}
 
 @app.get("/logout")
 async def logout(request: Request):
