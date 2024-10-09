@@ -241,20 +241,23 @@ async def callback(
     state: str,
     error: str = None,
 ):
-    if error:
-        try:
-            client.states.remove(state)
-        except ValueError:
+    try:
+        if error:
+            try:
+                client.states.remove(state)
+            except ValueError:
+                return RedirectResponse("/login")
+        if state not in client.states:
             return RedirectResponse("/login")
-    if state not in client.states:
-        return RedirectResponse("/login")
-    
-    user_data, token_data = await client.http.get_user_data(code)
-    user = await client.http.get_or_create_user(user_data, token_data)
-    user_cache[user.key] = user
-    request.session["key"] = sign_data(user.key)
-    
-    return templates.TemplateResponse("loggedin.html", {"request": request, "user": user})
+        
+        user_data, token_data = await client.http.get_user_data(code)
+        user = await client.http.get_or_create_user(user_data, token_data)
+        user_cache[user.key] = user
+        request.session["key"] = sign_data(user.key)
+        
+        return templates.TemplateResponse("loggedin.html", {"request": request, "user": user})
+    except Exception as e:
+        return str(e)
 
 @app.get("/logout")
 async def logout(request: Request):
