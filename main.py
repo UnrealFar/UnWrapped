@@ -16,7 +16,6 @@ import cachetools
 from tortoise import Tortoise
 from dotenv import load_dotenv
 
-
 from models import User, dc_dumps
 from _http import HTTP
 
@@ -57,18 +56,12 @@ class Client:
 
     async def setup(self):
         await self.retry_db_connection()
-    
-        #sql = 'ALTER TABLE "user" ALTER COLUMN "key" SET NOT NULL;'
-        #await Tortoise.get_connection("default").execute_script(sql)
-        #in case you need to run some sql script
-
         await self.http.setup()
         uc = 0
 
         for user in await User.all():
             uc += 1
             asyncio.create_task(self.refresh_task(user))
-
 
     async def refresh_task(self, user):
         now = datetime.datetime.now(pytz.utc)
@@ -95,7 +88,6 @@ client = Client(
     ],
     app=app
 )
-
 
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -131,7 +123,6 @@ def unsign_data(data) -> str:
     return client.serializer.loads(data)
 
 user_cache = cachetools.TTLCache(maxsize=100, ttl=30)
-
 
 async def get_cached_user(key: str) -> User:
     try:
@@ -170,7 +161,6 @@ async def favicon():
         #"Cache-Control": "public, max-age=31536000"
     }
     return FileResponse(file_path, headers=headers)
-
 
 @app.get("/profile")
 async def profile(request: Request, user: User = get_user):
