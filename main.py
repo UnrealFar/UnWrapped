@@ -1,5 +1,6 @@
+import traceback
 from fastapi import FastAPI, Request, Depends
-from fastapi.responses import RedirectResponse, FileResponse, JSONResponse
+from fastapi.responses import RedirectResponse, JSONResponse, FileResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
@@ -10,7 +11,6 @@ import random
 import base64
 import datetime
 import asyncio
-import traceback
 import pytz
 import cachetools
 from tortoise import Tortoise
@@ -62,6 +62,8 @@ class Client:
         for user in await User.all():
             uc += 1
             asyncio.create_task(self.refresh_task(user))
+
+        print(f"Loaded {uc} users")
 
     async def refresh_task(self, user):
         now = datetime.datetime.now(pytz.utc)
