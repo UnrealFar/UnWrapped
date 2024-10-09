@@ -15,11 +15,16 @@ import pytz
 import cachetools
 from tortoise import Tortoise
 from dotenv import load_dotenv
+import logging
+
 
 from models import User, dc_dumps
 from _http import HTTP
 
 load_dotenv()
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 class App(FastAPI):
     client: "Client"
@@ -63,7 +68,7 @@ class Client:
             uc += 1
             asyncio.create_task(self.refresh_task(user))
 
-        print(f"Loaded {uc} users")
+        logger.info(f"Loaded {uc} users")
 
     async def refresh_task(self, user):
         now = datetime.datetime.now(pytz.utc)
