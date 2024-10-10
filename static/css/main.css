@@ -53,6 +53,7 @@ html, body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 #navbar #navButtons {
@@ -86,8 +87,8 @@ button:hover {
     padding: 0;
     margin: 0;
     border: none;
-    max-width: 150px;
-    max-height: 75px;
+    max-width: 130px;
+    max-height: 60px;
     border-radius: 20px;
 }
 
@@ -99,30 +100,35 @@ button:hover {
     border-radius: 20px;
 }
 
-#navbar #profileButton {
-    border-radius: 50%;
-    padding: 0;
-    border: none;
-    background: none;
+#navbar #navButtons {
     display: flex;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
+}
+
+#navbar #navButtons button {
+    margin-left: 10px;
 }
 
 
-
-#profileButtonContainer {
+#navbar #profileButtonContainer {
     position: relative;
     display: inline-block;
 }
 
-#profileButton {
+#navbar #profileButton {
     background: none;
     border: none;
     padding: 0;
     cursor: pointer;
 }
+
+#navbar #profileImage {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+
 
 #profileImage {
     width: 60px;
@@ -136,7 +142,7 @@ button:hover {
     right: 0;
     background-color: #221e86;
     min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
     z-index: 1;
     border-radius: 10px;
 }
@@ -186,12 +192,20 @@ button:hover {
 
     #navbar {
         flex-direction: column;
-        align-items: flex-end;
+        align-items: flex-start; /* Left-align content */
+    }
+
+    #navbar #homeButton {
+        align-self: center;
+        height: 90px;
+        width: 140px;
     }
 
     #navbar #navButtons {
         margin-left: 0;
         margin-top: 10px;
+        width: 100%; /* Ensure full width on small screens */
+        justify-content: space-between;
     }
 
     button {
@@ -200,6 +214,15 @@ button:hover {
         width: 100%;
         box-sizing: border-box;
     }
+
+    #navbar #homeButton {
+        max-width: 100px;
+        max-height: 40px;
+    }
+
+    #navbar #profileButton {
+        margin-top: 10px;
+    }   
 
     .card {
         width: 90%;
