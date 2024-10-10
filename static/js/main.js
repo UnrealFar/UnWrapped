@@ -8,6 +8,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 <img src="/static/logo/LogoRectangle.png" alt="Logo">
             </button>
             <div id="navButtons">
+                <button id="topArtistsButton" onclick="window.location.href='/topartists'">Top Artists</button>
+                <button id="topTracksButton" onclick="window.location.href='/toptracks'">Top Tracks</button>
                 <!-- <button id="playlistsButton" onclick="window.location.href='/playlists'">Playlists</button> -->
                 <div id="profileButtonContainer">
                     <button id="profileButton" style="display:none;">

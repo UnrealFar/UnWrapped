@@ -124,11 +124,13 @@
                     <span class="cardSpan">
                         <h3 class="cardName">
                             <a href="${spotifyUrl}" target="_blank">${track.name}</a>
-                            <button class="spotifyButton" onclick="window.open('${spotifyUrl}')"></button>↗
-                        <p>${artistNames}</p>
-                    </span>
-                    <p>${albumName}</p>
+                            <button class="spotifyButton" onclick="window.open('${spotifyUrl}')"></button>
+                        </h3>
+
+                    <p>${artistNames}</p>
+                    <p>${albumName}</p> 
                     <p>Duration: ${minutes}:${seconds}</p>
+                    </span>
                 `;
                 cardColumn.appendChild(card);
             });

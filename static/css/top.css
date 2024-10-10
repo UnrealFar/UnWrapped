@@ -39,8 +39,8 @@ html, body {
 
 
 .card img {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     margin-left: 10px;
     margin-right: 10px;
     cursor: pointer;
@@ -50,11 +50,7 @@ html, body {
 }
 
 /* Text and links inside the card */
-.cardSpan {
-    color: white;
-    margin-left: 10px;
-    line-height: 1.2;
-}
+
 
 .card h2 {
     font-size: 1.5em;
@@ -74,7 +70,7 @@ html, body {
 
 .card a {
     margin-left: 10px;
-    color: #1DB954;
+    color: white;
     text-decoration: none;
 }
 
@@ -109,7 +105,7 @@ html, body {
 
 /* Spotify button */
 .spotifyButton {
-    background-color: inherit;
+    background: black;
     background-image: url('/spotify_logo');
     background-size: contain;
     background-repeat: no-repeat;
