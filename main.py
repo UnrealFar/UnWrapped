@@ -273,8 +273,9 @@ async def callback(
         return templates.TemplateResponse("loggedin.html", {"request": request, "user": user})
     except Exception as e:
         logger.error(f"Error during callback: {e}\n{traceback.format_exc()}")
+        if "user may not be registered" in str(e):
+            return {"error": "User is not registered as a tester. Please contact the administrator."}
         return {"error": str(e), "traceback": traceback.format_exc()}
-
 @app.get("/logout")
 async def logout(request: Request):
     request.session.pop("key", None)

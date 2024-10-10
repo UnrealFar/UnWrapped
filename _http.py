@@ -43,8 +43,7 @@ class HTTP:
             try:
                 return await response.json()
             except aiohttp.ContentTypeError:
-                logging.error(await response.text())
-                return await response.text()
+                raise Exception(await response.text())
 
 
     async def refresh_token(self, user) -> None:
