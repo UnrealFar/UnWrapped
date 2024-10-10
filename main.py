@@ -115,6 +115,14 @@ async def get_logo(logo_name: str):
     }
     return FileResponse(file_path, headers=headers)
 
+@app.get("/spotify_logo")
+async def get_spotify_logo():
+    file_path = f"static/logo/SpotifyLogo.png"
+    headers = {
+        "Cache-Control": "public, max-age=31536000"
+    }
+    return FileResponse(file_path, headers=headers)
+
 @app.get("/privacy_policy")
 async def toc(request: Request):
     return templates.TemplateResponse(

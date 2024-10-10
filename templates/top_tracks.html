@@ -117,15 +117,18 @@
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.id = `card${page * 20 + index + 1}`;
+                const minutes = Math.floor(track.duration_ms / 60000);
+                const seconds = Math.floor((track.duration_ms % 60000) / 1000).toString().padStart(2, '0');
                 card.innerHTML = `
-                    <h2>#${page * 20 + index + 1}</h2>
-                    <img src="${albumImage}" alt="${track.name}" class="cardImage" loading="lazy">
+                    <h2>#${page * 20 + index + 1} <img src="${albumImage}" alt="${track.name}" class="cardImage" loading="lazy"></h2> 
                     <span class="cardSpan">
-                        <h3><a href="${spotifyUrl}" target="_blank">${track.name}</a></h3>
+                        <h3 class="cardName">
+                            <a href="${spotifyUrl}" target="_blank">${track.name}</a>
+                            <button class="spotifyButton" onclick="window.open('${spotifyUrl}')"></button>↗
                         <p>${artistNames}</p>
                     </span>
                     <p>${albumName}</p>
-                    <p>${Math.floor(track.duration_ms / 60000)}:${Math.floor((track.duration_ms % 60000) / 1000)}</p>
+                    <p>Duration: ${minutes}:${seconds}</p>
                 `;
                 cardColumn.appendChild(card);
             });

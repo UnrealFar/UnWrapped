@@ -111,7 +111,10 @@
                     <h2>#${page * 20 + index + 1}</h2>
                     <img src="${artistImage}" alt="${artist.name}" class="cardImage" loading="lazy">
                     <span class="cardSpan">
-                        <h3><a href="${spotifyUrl}" target="_blank">${artist.name}</a></h3>
+                        <h3 class="cardName">
+                            <a href="${spotifyUrl}" target="_blank">${artist.name}</a>
+                            <button class="spotifyButton" onclick="window.open('${spotifyUrl}')"></button>↗
+                        </h3>
                         <p>Followers: ${artist.followers || 'N/A'}</p>
                         <p>Genres: ${artist.genres?.join(', ') || 'N/A'}</p>
                     </span>

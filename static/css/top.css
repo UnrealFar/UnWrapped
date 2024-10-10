@@ -1,63 +1,69 @@
 html, body {
     background: linear-gradient(to bottom, #7244ad, #1d1d1d, 90%);
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.cardColumn {
+
+#cardColumn {
     background: linear-gradient(to bottom, #6932b0, #1d1d1d, 10%);
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    justify-content: flex-start;
-    margin-top: 50px;
-    z-index: 5;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); /* Responsive columns */
+    gap: 20px; /* Spacing between cards */
+    justify-items: center;
+    align-items: start;
+    padding: 50px 10px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
 }
+
 
 .card {
     background: none;
     border: 1px solid white;
     border-radius: 10px;
     padding: 10px;
-    margin: 10px;
-    text-align: left;
-    width: 95%;
-    height: auto;
+    width: 33%;
+    min-width: 400px;
+    height: 400px;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
-}
+    justify-content: center;
+    justify-items: center;
+    box-sizing: border-box;
+    overflow: hidden;
+}       
 
-.headerCard {
-    font-weight: bold;
-    background-color: rgba(255, 255, 255, 0.1);
-}
 
 .card img {
-    width: 50px;
-    height: 50px;
+    width: 80px;
+    height: 80px;
     margin-left: 10px;
     margin-right: 10px;
     cursor: pointer;
     display: block;
-    border-radius: 2px;
+    border-radius: 4px;
+    border: none;
 }
 
-
+/* Text and links inside the card */
 .cardSpan {
     color: white;
     margin-left: 10px;
-    line-height: 0.8;
-    flex: 1;
+    line-height: 1.2;
 }
 
 .card h2 {
-    margin-right: 10px;
-    font-size: 2em;
+    font-size: 1.5em;
 }
 
 .card h3 {
     margin-left: 10px;
     margin-right: 10px;
-    font-size: 1.5em;
+    font-size: 1.2em;
 }
 
 .card p {
@@ -67,7 +73,8 @@ html, body {
 }
 
 .card a {
-    color: #b0b0b0;
+    margin-left: 10px;
+    color: #1DB954;
     text-decoration: none;
 }
 
@@ -79,16 +86,37 @@ html, body {
     background-color: #200000;
     color: white;
     min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.23);
-    z-index: 1;
-    border-radius: 2px;
+    padding: 10px;
+    border: 1px solid #1DB954;
+    border-radius: 4px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
 #timeRangeSelect option {
-    background-color: #121212;
+    background-color: #0f3e20;
     color: white;
 }
 
+
+
 #timeRangeSelect:hover {
+    background-color: #1DB954;
     border-color: #14833b;
+}
+
+/* Spotify button */
+.spotifyButton {
+    background-color: inherit;
+    background-image: url('/spotify_logo');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding: 0;
+    border: none;
+    margin: 0;
+    width: 70px;
+    height: 25px;
 }
