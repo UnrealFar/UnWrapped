@@ -39,7 +39,7 @@
         <div class="card" id="card1">
             <h2>Top Arists</h2>
             <p>View your top artists listend to</p>
-            <button id="playlists">View</button>
+            <button id="topArtists">View</button>
         </div>
         <div class="card" id="card2">
             <h2>Playlists</h2>
@@ -61,6 +61,9 @@
         <script>
             document.getElementById('topTracks').onclick = function() {
                 window.location.href = '/toptracks';
+            }
+            document.getElementById('topArtists').onclick = function() {
+                window.location.href = '/topartists';
             }
             document.getElementById('playlists').onclick = function() {
                 window.location.href = '/playlists';

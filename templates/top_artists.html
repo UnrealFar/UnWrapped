@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <title>UnWrapped | Top Artists</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="og:title" content="UnWrapped | Your Top Artists!">
+    <meta name="og:description" content="Get your top listened artists.">
+    <meta name="og:url" content="https://un-wrapped.vercel.app">
+    <meta name="keywords" content="spotify, wrapped, stats, music, top tracks, top artists">
+    <meta name="author" content="Farhan Ahmed">
+    <meta name="robots" content="index, follow">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+    <meta name="theme-color" content="#1DB954">
+    <link rel="stylesheet" type="text/css" href="static/css/main.css">
+    <link rel="stylesheet" type="text/css" href="static/css/top.css">
+</head>
+<body>
+    <nav></nav>
+    <h1>Your Top Artists</h1>
+    <form id="timeRangeForm">
+        <label for="timeRangeSelect">Select Time Range: </label>
+        <select id="timeRangeSelect" name="type" onchange="document.getElementById('timeRangeForm').submit()">
+            <option value="short_term" {% if type == 'short_term' %}selected{% endif %}>Past 1 Month</option>
+            <option value="medium_term" {% if type == 'medium_term' %}selected{% endif %}>Past 6 Months</option>
+            <option value="long_term" {% if type == 'long_term' %}selected{% endif %}>Past Year</option>
+        </select>
+    </form>
+    <h2>
+        {% if type == 'short_term' %}
+            Based on your listening history over the past 1 month.
+        {% elif type == 'medium_term' %}
+            Based on your listening history over the past 6 months.
+        {% elif type == 'long_term' %}
+            Based on your listening history over the past year.
+        {% else %}
+            Based on your listening history over the past 1 month.
+        {% endif %}
+    </h2>
+
+    <div id="cardColumn"></div>
+    <button id="loadMoreButton">Load More...</button>
+    <br><br><br><br><br>
+
+    <script src="static/js/main.js"></script>
+    <script>
+        let page = 0;
+        let isLoading = false;
+        const cardColumn = document.getElementById('cardColumn');
+        const loadMoreButton = document.getElementById('loadMoreButton');
+        const type = '{{ type }}';
+
+        function cacheData(key, data) {
+            const cache = {
+                timestamp: Date.now(),
+                data: data
+            };
+            localStorage.setItem(key, JSON.stringify(cache));
+        }
+
+        function getCachedData(key) {
+            const cache = JSON.parse(localStorage.getItem(key));
+            if (cache && (Date.now() - cache.timestamp < 60000)) {
+                return cache.data;
+            }
+            return null;
+        }
+
+        async function loadMoreArtists() {
+            if (isLoading) return;
+            isLoading = true;
+            const cacheKey = `artists_${type}_page_${page}`;
+            const cachedData = getCachedData(cacheKey);
+
+            if (cachedData) {
+                appendArtists(cachedData);
+                isLoading = false;
+            } else {
+                try {
+                    const response = await fetch(`/load_more_topartists?type=${type}&page=${page}`);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const data = await response.json();
+                    if (data.artists) {
+                        const parsedArtists = data.artists.map(artist => JSON.parse(artist));
+                        cacheData(cacheKey, parsedArtists);
+                        appendArtists(parsedArtists);
+                    } else {
+                        console.error('No artists found in response:', data);
+                    }
+                } catch (error) {
+                    console.error('Error loading more artists:', error);
+                } finally {
+                    isLoading = false;
+                }
+            }
+            page++;
+        }
+
+        function appendArtists(artists) {
+            artists.forEach((artist, index) => {
+                const artistImage = artist.image || 'default_image_url';
+                const spotifyUrl = `https://open.spotify.com/artist/${artist.id}`;
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.id = `card${page * 20 + index + 1}`;
+                card.innerHTML = `
+                    <h2>#${page * 20 + index + 1}</h2>
+                    <img src="${artistImage}" alt="${artist.name}" class="cardImage" loading="lazy">
+                    <span class="cardSpan">
+                        <h3><a href="${spotifyUrl}" target="_blank">${artist.name}</a></h3>
+                        <p>Followers: ${artist.followers || 'N/A'}</p>
+                        <p>Genres: ${artist.genres?.join(', ') || 'N/A'}</p>
+                    </span>
+                `;
+                cardColumn.appendChild(card);
+            });
+        }
+
+        loadMoreButton.addEventListener('click', () => {
+            loadMoreArtists();
+        });
+
+        loadMoreArtists();
+    </script>
+</body>
+</html>

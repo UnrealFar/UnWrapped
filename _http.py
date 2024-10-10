@@ -208,5 +208,38 @@ class HTTP:
             tracks.append(track)
         return tracks
 
+    async def get_top_artists(
+        self, user: User,
+        type: str = "short_term",
+        offset: int = 0,
+        limit: int = 20
+    ) -> List[Artist]:
+        url = f"https://api.spotify.com/v1/me/top/artists"
+        data = await self.request(
+            "GET",
+            url,
+            headers={
+                "Authorization": f"Bearer {user.access_token}",
+            },
+            params={
+                "time_range": type,
+                "offset": offset,
+                "limit": limit,
+            },
+        )
+        artists = []
+        for item in data["items"]:
+            artist = Artist(
+                id=item["id"],
+                name=item["name"],
+                uri=item["uri"],
+                image=item["images"][0]["url"],
+                popularity=item["popularity"],
+                followers=item["followers"]["total"],
+                genres=item["genres"],
+            )
+            artists.append(artist)
+        return artists
+
     async def close(self):
         await self.session.close()

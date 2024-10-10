@@ -1,6 +1,6 @@
 from tortoise import Model, fields
 from dataclasses import dataclass, asdict
-from typing import List, Dict
+from typing import List, Optional
 import json
 
 class DataclassEncoder(json.JSONEncoder):
@@ -55,14 +55,18 @@ class Artist:
     id: str
     name: str
     uri: str
+    image: str | None = None
+    popularity: str | None = None
+    followers: int | None = None
+    genres: List[str] | None = None
 
 @dataclass
 class Album:
     id: str
-    name: str
-    artists: List[Artist]
-    image: str
     uri: str
+    name: str | None = None
+    artists: List[Artist] | None = None
+    image: str | None = None
 
 @dataclass
 class Track:

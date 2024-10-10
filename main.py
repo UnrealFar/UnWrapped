@@ -179,11 +179,12 @@ async def profile(request: Request, user: User = get_user):
 
 @app.get("/playlists")
 async def playlists(request: Request, refresh: bool = False, user: User = get_user):
+    return "Not implemented yet"
     if not user:
         return RedirectResponse("/login")
     if refresh or not client.http.user_playlists:
         playlists = await client.http.get_playlists(user, offset=0, limit=20)
-        client.http.user_playlists[user.spotify_id] = playlists
+        client.http.user_playlists[user.spotify_id] = playlists 
     else:
         playlists = client.http.user_playlists[user.spotify_id]
     return templates.TemplateResponse(
@@ -201,7 +202,7 @@ async def load_more_playlists(request: Request, offset: int, user: User = get_us
     )
 
 @app.get("/toptracks")
-async def top(request: Request, type: str = "short_term", user: User = get_user):
+async def top_tracks(request: Request, type: str = "short_term", user: User = get_user):
     if not user:
         return RedirectResponse("/login")
     return templates.TemplateResponse(
@@ -216,6 +217,23 @@ async def load_more_toptracks(request: Request, page:int, type: str = "short_ter
     tracks = await client.http.get_top_tracks(user, type=type, offset=offset)
     tracks.sort(key=lambda x: x.popularity, reverse=True)
     return JSONResponse({"tracks": [dc_dumps(track) for track in tracks]})
+
+@app.get("/topartists")
+async def top_artists(request: Request, type: str = "short_term", user: User = get_user):
+    if not user:
+        return RedirectResponse("/login")
+    return templates.TemplateResponse(
+        "top_artists.html", {"request":request, "type":type}
+    )
+
+@app.get('/load_more_topartists')
+async def load_more_topartists(request: Request, page:int, type: str = "short_term", user: User = get_user):
+    if not user:
+        return RedirectResponse("/login")
+    offset = page * 20
+    artists = await client.http.get_top_artists(user, type=type, offset=offset)
+    artists.sort(key=lambda x: x.popularity, reverse=True)
+    return JSONResponse({"artists": [dc_dumps(artist) for artist in artists]})
 
 @app.get("/login")
 async def login(
@@ -260,6 +278,11 @@ async def callback(
 async def logout(request: Request):
     request.session.pop("key", None)
     return RedirectResponse("/")
+
+pong = "pong"
+@app.get("/ping")
+async def ping():
+    return pong
 
 async def startup():
     try:
