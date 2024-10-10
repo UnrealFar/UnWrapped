@@ -40,7 +40,11 @@ class HTTP:
         if not self.session:
             self.session = aiohttp.ClientSession()
         async with self.session.request(method, url, **kwargs) as response:
-            return await response.json()
+            try:
+                return await response.json()
+            except aiohttp.ContentTypeError:
+                logging.error(await response.text())
+                return await response.text()
 
 
     async def refresh_token(self, user) -> None:
