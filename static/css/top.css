@@ -116,3 +116,36 @@ html, body {
     width: 70px;
     height: 25px;
 }
+
+@media (max-width: 600px) {
+    #cardColumn {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+
+    .card {
+        min-width: 300px;
+        height: 300px;
+    }
+
+    .card img {
+        width: 70px;
+        height: 70px;
+    }
+
+    .card h2 {
+        font-size: 1.2em;
+    }
+
+    .card h3 {
+        font-size: 1em;
+    }
+
+    .card p {
+        font-size: 0.8em;
+    }
+
+    .spotifyButton {
+        width: 50px;
+        height: 20px;
+    }
+}
