@@ -272,6 +272,7 @@ async def callback(
         
         return templates.TemplateResponse("loggedin.html", {"request": request, "user": user})
     except Exception as e:
+        logger.error(f"Error during callback: {e}\n{traceback.format_exc()}")
         return {"error": str(e), "traceback": traceback.format_exc()}
 
 @app.get("/logout")
@@ -279,10 +280,9 @@ async def logout(request: Request):
     request.session.pop("key", None)
     return RedirectResponse("/")
 
-pong = "pong"
-@app.get("/ping")
+@app.head("/ping")
 async def ping():
-    return pong
+    return
 
 async def startup():
     try:
