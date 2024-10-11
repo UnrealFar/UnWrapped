@@ -46,6 +46,13 @@ html, body {
     scrollbar-color: rgba(255, 255, 255, 0.5) transparent;
 }
 
+nav {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+}
+
 #navbar {
     background-color: inherit;
     padding: 10px;
@@ -81,6 +88,7 @@ button {
 button:hover {
     background-color: #0f5d2a;
 }
+
 
 #navbar #homeButton {
     background: none;
