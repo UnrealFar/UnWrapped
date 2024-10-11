@@ -241,7 +241,7 @@ class HTTP:
             collaborative=data["collaborative"],
             description=data["description"],
             href=data["href"],
-            image=img_url
+            image=img_url,
             owner_id=data["owner"]["id"],
             owner_name=data["owner"]["display_name"],
             public=data["public"],

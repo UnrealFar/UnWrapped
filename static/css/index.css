@@ -48,7 +48,7 @@ h1 {
 }
 
 .card {
-    background: linear-gradient(to bottom, #48468f, #452121);
+    background: #101010;
     border-radius: 10px;
     padding: 20px;
     margin: 10px;
