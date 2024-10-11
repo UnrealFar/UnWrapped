@@ -54,9 +54,8 @@ nav {
 }
 
 #navbar {
-    background-color: inherit;
+    background-color: black;
     padding: 10px;
-    border-radius: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -92,11 +91,10 @@ button:hover {
 
 #navbar #homeButton {
     background: none;
-    padding: 0;
+    padding: 1px;
     margin: 0;
-    border: none;
-    max-width: 130px;
-    max-height: 60px;
+    max-width: 140px;
+    max-height: 70px;
     border-radius: 20px;
 }
 
@@ -105,7 +103,6 @@ button:hover {
     height: 100%;
     cursor: pointer;
     display: block;
-    border-radius: 20px;
 }
 
 #navbar #navButtons {

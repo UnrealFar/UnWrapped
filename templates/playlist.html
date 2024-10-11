@@ -20,9 +20,14 @@
 </head>
 <body>
     <nav></nav>
-    <h1>Playlist: {{ playlist.name }}</h1>
-    <h2>Created by: {{ playlist.owner_name or playlist.owner_id }}</h2>
-    <p>Total Tracks: {{ playlist.track_count }}</p>
+    <div id="playlistHeader" class="playlist-header">
+        <br><br>
+        <img id="playlistImage" src="{{ playlist.image }}" alt="Playlist Image" class="playlist-image">
+        <h1 id="playlistName">Playlist: {{ playlist.name }}</h1>
+        <h2>Created by: {{ playlist.owner_name or playlist.owner_id }}</h2>
+        <p>Total Tracks: {{ playlist.track_count }}</p>
+        <br><br>
+    </div>
 
     <div id="cardColumn"></div>
     <button id="loadMoreButton">Load More...</button>
@@ -144,11 +149,24 @@
                 card.style.color = 'white';
             }
         }
-    
+
+        function applyHeaderBackgroundColor() {
+            const img = document.getElementById('playlistImage');
+            img.crossOrigin = 'Anonymous';
+            img.onload = () => {
+                const color = colorThief.getColor(img);
+                const tdcolor = color
+                const tdcolorRgb = `rgb(${tdcolor[0]}, ${tdcolor[1]}, ${tdcolor[2]})`;  
+                document.getElementById('playlistHeader').style.background = `linear-gradient(to bottom, ${tdcolorRgb}, #553a78)`;
+                document.getElementById('body').style.background = tdcolorRgb;
+            };
+        }
+
         loadMoreButton.addEventListener('click', () => {
             loadMoreTracks();
         });
-    
+
+        applyHeaderBackgroundColor();
         loadMoreTracks();
     </script>
 </body>
