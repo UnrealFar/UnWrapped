@@ -16,6 +16,7 @@
     <meta name="theme-color" content="#1DB954">
     <link rel="stylesheet" type="text/css" href="static/css/main.css">
     <link rel="stylesheet" type="text/css" href="static/css/top.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
 </head>
 <body>
     <nav></nav>
@@ -51,7 +52,8 @@
         const cardColumn = document.getElementById('cardColumn');
         const loadMoreButton = document.getElementById('loadMoreButton');
         const type = '{{ type }}';
-
+        const colorThief = new ColorThief();
+    
         function cacheData(key, data) {
             const cache = {
                 timestamp: Date.now(),
@@ -59,7 +61,7 @@
             };
             localStorage.setItem(key, JSON.stringify(cache));
         }
-
+    
         function getCachedData(key) {
             const cache = JSON.parse(localStorage.getItem(key));
             if (cache && (Date.now() - cache.timestamp < 60000)) {
@@ -67,13 +69,13 @@
             }
             return null;
         }
-
+    
         async function loadMoreArtists() {
             if (isLoading) return;
             isLoading = true;
             const cacheKey = `artists_${type}_page_${page}`;
             const cachedData = getCachedData(cacheKey);
-
+    
             if (cachedData) {
                 appendArtists(cachedData);
                 isLoading = false;
@@ -99,7 +101,7 @@
             }
             page++;
         }
-
+    
         function appendArtists(artists) {
             artists.forEach((artist, index) => {
                 const artistImage = artist.image || 'default_image_url';
@@ -107,6 +109,7 @@
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.id = `card${page * 20 + index + 1}`;
+    
                 card.innerHTML = `
                     <h2>#${page * 20 + index + 1}</h2>
                     <img src="${artistImage}" alt="${artist.name}" class="cardImage" loading="lazy">
@@ -119,14 +122,40 @@
                     <p>Followers: ${artist.followers || 'N/A'}</p>
                     <p>Genres: ${artist.genres?.join(', ') || 'N/A'}</p>
                 `;
+    
+                const imgCacheKey = `artist_image_${artist.id}`;
+                const cachedImage = getCachedData(imgCacheKey);
+    
+                if (cachedImage) {
+                    applyImageColor(cachedImage, card);
+                } else {
+                    const img = new Image();
+                    img.crossOrigin = 'Anonymous';
+                    img.src = artistImage;
+                    img.onload = () => {
+                        const color = colorThief.getColor(img);
+                        cacheData(imgCacheKey, color);
+                        applyImageColor(color, card);
+                    };
+                }
+    
                 cardColumn.appendChild(card);
             });
+        }
+
+        function applyImageColor(color, card) {
+            const tdcolor = color.map(channel => Math.floor(channel * 0.7 + 255 * 0.3));
+            const tdcolorRgb = `rgb(${tdcolor[0]}, ${tdcolor[1]}, ${tdcolor[2]})`;
+            const originalColorRgb = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+    
+            card.style.background = `linear-gradient(to bottom, ${tdcolorRgb}, black 100%)`;
+            card.style.borderColor = originalColorRgb;
         }
 
         loadMoreButton.addEventListener('click', () => {
             loadMoreArtists();
         });
-
+    
         loadMoreArtists();
     </script>
 </body>
