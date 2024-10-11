@@ -15,6 +15,7 @@ from models import (
     Track,
     Artist,
     Album,
+    PlaylistTrack
 )
 
 if TYPE_CHECKING:
@@ -32,7 +33,6 @@ class HTTP:
     def __init__(self, client: Client):
         self.client = client
         self.session = None
-        self.user_playlists: Dict[str, List[Playlist]] = {}
 
         self._global_semaphore = asyncio.Semaphore(10)
         self._user_locks = {}
@@ -165,7 +165,7 @@ class HTTP:
         await user.save()
         return user
 
-    async def get_user_playlists(self, user, limit: int = 50, offset: int = 0) -> List[Playlist]:
+    async def get_user_playlists(self, user, limit: int = 20, offset: int = 0) -> List[Playlist]:
         url = "https://api.spotify.com/v1/me/playlists"
         data = await self.request(
             "GET",
@@ -188,15 +188,81 @@ class HTTP:
                 description=item["description"],
                 href=item["href"],
                 image=item["images"][0]["url"],
-                owner=item["owner"]["id"],
+                owner_id=item["owner"]["id"],
+                owner_name=item["owner"]["display_name"],
                 public=item["public"],
                 snapshot_id=item["snapshot_id"],
                 track_href=item["tracks"]["href"],
                 track_count=item["tracks"]["total"],
             )
             playlists.append(playlist)
-        self.user_playlists[user.spotify_id] = playlists
         return playlists
+
+    async def get_playlist(self, user: User, playlist_id: str) -> Playlist:
+        url = f"https://api.spotify.com/v1/playlists/{playlist_id}"
+        data = await self.request(
+            "GET",
+            url,
+            headers={
+                "Authorization": f"Bearer {user.access_token}",
+            },
+            params={
+                "offset": 0,
+                "limit": 0,
+                "fields": "id,name,description,href,images,owner,public,snapshot_id,collaborative,tracks(total,href)",
+            },
+        )
+        playlist = Playlist(
+            id=data["id"],
+            name=data["name"],
+            collaborative=data["collaborative"],
+            description=data["description"],
+            href=data["href"],
+            image=data["images"][0]["url"],
+            owner_id=data["owner"]["id"],
+            owner_name=data["owner"]["display_name"],
+            public=data["public"],
+            snapshot_id=data["snapshot_id"],
+            track_href=data["tracks"]["href"],
+            track_count=data["tracks"]["total"],
+        )
+        return playlist
+
+    async def get_playlist_tracks(self, user: User, playlist_id: str, limit: int=20, offset: int =0) -> List[PlaylistTrack]:
+        url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
+        data = await self.request(
+            "GET",
+            url,
+            headers={
+                "Authorization": f"Bearer {user.access_token}",
+            },
+            params={
+                "limit": limit,
+                "offset": offset,
+            },
+        )
+        tracks = []
+        for item in data["items"]:
+            track = PlaylistTrack(
+                added_at=item["added_at"],
+                added_by=item["added_by"]["id"],
+                id=item["track"]["id"],
+                name=item["track"]["name"],
+                artists=[Artist(id=artist["id"], name=artist["name"], uri=artist["uri"]) for artist in item["track"]["artists"]],
+                album=Album(
+                    id=item["track"]["album"]["id"],
+                    name=item["track"]["album"]["name"],
+                    artists=[Artist(id=artist["id"], name=artist["name"], uri=artist["uri"]) for artist in item["track"]["album"]["artists"]],
+                    image=item["track"]["album"]["images"][0]["url"],
+                    uri=item["track"]["album"]["uri"],
+                ),
+                duration_ms=item["track"]["duration_ms"],
+                popularity=item["track"]["popularity"],
+                explicit=item["track"]["explicit"],
+                uri=item["track"]["uri"],
+            )
+            tracks.append(track)
+        return tracks
 
     async def get_top_tracks(
             self, user: User,

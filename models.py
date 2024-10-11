@@ -41,7 +41,8 @@ class Playlist:
     collaborative: bool
     description: str
     href: str
-    owner: str
+    owner_id: str
+    owner_name: str
     public: bool
     snapshot_id: str
     track_href: str
@@ -78,5 +79,11 @@ class Track:
     popularity: int
     explicit: bool
     uri: str
+    preview_url: str | None = None
+
+@dataclass
+class PlaylistTrack(Track):
+    added_at: str | None = None
+    added_by: str | None = None
 
 

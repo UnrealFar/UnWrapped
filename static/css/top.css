@@ -74,7 +74,8 @@ html, body {
 }
 
 .card a:hover {
-    color: white;
+    color: #b0b0b0;
+    font-size: 1.1em;
 }
 
 #timeRangeSelect {

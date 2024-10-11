@@ -202,6 +202,24 @@ async def load_more_playlists(request: Request, page: int, user: User = get_user
     playlists = [dc_dumps(playlist) for playlist in playlists]
     return JSONResponse({"playlists": playlists})
 
+@app.get("/playlist")
+async def playlist(request: Request, playlist_id: str, user: User = get_user):
+    if not user:
+        return RedirectResponse("/login")
+    playlist = await client.http.get_playlist(user, playlist_id)
+    return templates.TemplateResponse(
+        "playlist.html", {"request": request, "playlist": playlist}
+    )
+
+@app.get('/load_more_playlist_tracks')
+async def load_more_playlist_tracks(request: Request, playlist_id: str, page:int, user: User = get_user):
+    if not user:
+        return RedirectResponse("/login")
+    offset = page * 20
+    tracks = await client.http.get_playlist_tracks(user, playlist_id, offset=offset)
+    tracks.sort(key=lambda x: x.added_at, reverse=True)
+    return JSONResponse({"tracks": [dc_dumps(track) for track in tracks]})
+
 @app.get("/toptracks")
 async def top_tracks(request: Request, type: str = "short_term", user: User = get_user):
     if not user:
