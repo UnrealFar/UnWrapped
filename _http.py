@@ -9,14 +9,7 @@ import tortoise
 import logging
 import asyncio
 
-from models import (
-    User,
-    Playlist,
-    Track,
-    Artist,
-    Album,
-    PlaylistTrack
-)
+from models import User, Playlist, Track, Artist, Album, PlaylistTrack
 
 if TYPE_CHECKING:
     from main import Client
@@ -28,7 +21,6 @@ class HTTP:
     _global_semaphore: asyncio.Semaphore
     _user_locks: Dict[str, asyncio.Lock]
     _user_rate_limits: Dict[str, int]
-    
 
     def __init__(self, client: Client):
         self.client = client
@@ -58,26 +50,38 @@ class HTTP:
         async with self._global_semaphore:
             if user_id:
                 async with await self._get_user_lock(user_id):
-                    return await self._make_request_with_retry(method, url, user_id, **kwargs)
+                    return await self._make_request_with_retry(
+                        method, url, user_id, **kwargs
+                    )
             else:
-                return await self._make_request_with_retry(method, url, user_id, **kwargs)
+                return await self._make_request_with_retry(
+                    method, url, user_id, **kwargs
+                )
 
     async def _make_request_with_retry(self, method, url, user_id=None, **kwargs):
         retry_after = self._user_rate_limits.get(user_id, 0)
         if retry_after:
-            logging.warning(f"User {user_id} is rate limited. Retrying after {retry_after} seconds...")
+            logging.warning(
+                f"User {user_id} is rate limited. Retrying after {retry_after} seconds..."
+            )
             await asyncio.sleep(retry_after)
 
         async with self.session.request(method, url, **kwargs) as response:
             if response.status == 429:
                 retry_after = int(response.headers.get("Retry-After", 1))
-                logging.warning(f"Rate limit hit for user {user_id}, retrying after {retry_after} seconds...")
+                logging.warning(
+                    f"Rate limit hit for user {user_id}, retrying after {retry_after} seconds..."
+                )
                 self._user_rate_limits[user_id] = retry_after
                 await asyncio.sleep(retry_after)
-                return await self._make_request_with_retry(method, url, user_id, **kwargs)
+                return await self._make_request_with_retry(
+                    method, url, user_id, **kwargs
+                )
 
             if response.status >= 400:
-                raise Exception(f"HTTP Error: {response.status}, {await response.text()}")
+                raise Exception(
+                    f"HTTP Error: {response.status}, {await response.text()}"
+                )
 
             self._user_rate_limits[user_id] = 0
             try:
@@ -100,7 +104,9 @@ class HTTP:
             },
         )
         user.access_token = data["access_token"]
-        user.token_expires = datetime.datetime.now(pytz.utc) + datetime.timedelta(seconds=data["expires_in"])
+        user.token_expires = datetime.datetime.now(pytz.utc) + datetime.timedelta(
+            seconds=data["expires_in"]
+        )
         await user.save()
 
     async def get_user_data(self, code: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
@@ -143,7 +149,8 @@ class HTTP:
                 spotify_id=user_data["id"],
                 access_token=access_token,
                 refresh_token=refresh_token,
-                token_expires=datetime.datetime.now() + datetime.timedelta(seconds=expires_in),
+                token_expires=datetime.datetime.now()
+                + datetime.timedelta(seconds=expires_in),
                 display_name=user_data["display_name"],
                 email=user_data["email"],
                 uri=user_data["uri"],
@@ -155,7 +162,9 @@ class HTTP:
         else:
             user.access_token = access_token
             user.refresh_token = refresh_token
-            user.token_expires = datetime.datetime.now() + datetime.timedelta(seconds=expires_in)
+            user.token_expires = datetime.datetime.now() + datetime.timedelta(
+                seconds=expires_in
+            )
             user.display_name = user_data["display_name"]
             user.email = user_data["email"]
             user.uri = user_data["uri"]
@@ -165,7 +174,9 @@ class HTTP:
         await user.save()
         return user
 
-    async def get_user_playlists(self, user, limit: int = 20, offset: int = 0) -> List[Playlist]:
+    async def get_user_playlists(
+        self, user, limit: int = 20, offset: int = 0
+    ) -> List[Playlist]:
         url = "https://api.spotify.com/v1/me/playlists"
         data = await self.request(
             "GET",
@@ -228,7 +239,9 @@ class HTTP:
         )
         return playlist
 
-    async def get_playlist_tracks(self, user: User, playlist_id: str, limit: int=20, offset: int =0) -> List[PlaylistTrack]:
+    async def get_playlist_tracks(
+        self, user: User, playlist_id: str, limit: int = 20, offset: int = 0
+    ) -> List[PlaylistTrack]:
         url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
         data = await self.request(
             "GET",
@@ -248,11 +261,17 @@ class HTTP:
                 added_by=item["added_by"]["id"],
                 id=item["track"]["id"],
                 name=item["track"]["name"],
-                artists=[Artist(id=artist["id"], name=artist["name"], uri=artist["uri"]) for artist in item["track"]["artists"]],
+                artists=[
+                    Artist(id=artist["id"], name=artist["name"], uri=artist["uri"])
+                    for artist in item["track"]["artists"]
+                ],
                 album=Album(
                     id=item["track"]["album"]["id"],
                     name=item["track"]["album"]["name"],
-                    artists=[Artist(id=artist["id"], name=artist["name"], uri=artist["uri"]) for artist in item["track"]["album"]["artists"]],
+                    artists=[
+                        Artist(id=artist["id"], name=artist["name"], uri=artist["uri"])
+                        for artist in item["track"]["album"]["artists"]
+                    ],
                     image=item["track"]["album"]["images"][0]["url"],
                     uri=item["track"]["album"]["uri"],
                 ),
@@ -265,10 +284,7 @@ class HTTP:
         return tracks
 
     async def get_top_tracks(
-            self, user: User,
-            type: str = "short_term",
-            offset: int = 0,
-            limit: int = 20
+        self, user: User, type: str = "short_term", offset: int = 0, limit: int = 20
     ) -> List[Track]:
         url = f"https://api.spotify.com/v1/me/top/tracks"
         data = await self.request(
@@ -288,11 +304,17 @@ class HTTP:
             track = Track(
                 id=item["id"],
                 name=item["name"],
-                artists=[Artist(id=artist["id"], name=artist["name"], uri=artist["uri"]) for artist in item["artists"]],
+                artists=[
+                    Artist(id=artist["id"], name=artist["name"], uri=artist["uri"])
+                    for artist in item["artists"]
+                ],
                 album=Album(
                     id=item["album"]["id"],
                     name=item["album"]["name"],
-                    artists=[Artist(id=artist["id"], name=artist["name"], uri=artist["uri"]) for artist in item["album"]["artists"]],
+                    artists=[
+                        Artist(id=artist["id"], name=artist["name"], uri=artist["uri"])
+                        for artist in item["album"]["artists"]
+                    ],
                     image=item["album"]["images"][0]["url"],
                     uri=item["album"]["uri"],
                 ),
@@ -305,10 +327,7 @@ class HTTP:
         return tracks
 
     async def get_top_artists(
-        self, user: User,
-        type: str = "short_term",
-        offset: int = 0,
-        limit: int = 20
+        self, user: User, type: str = "short_term", offset: int = 0, limit: int = 20
     ) -> List[Artist]:
         url = f"https://api.spotify.com/v1/me/top/artists"
         data = await self.request(
@@ -340,6 +359,3 @@ class HTTP:
     async def close(self):
         if self.session:
             await self.session.close()
-
-
-

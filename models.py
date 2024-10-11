@@ -3,14 +3,17 @@ from dataclasses import dataclass, asdict
 from typing import List, Optional
 import json
 
+
 class DataclassEncoder(json.JSONEncoder):
     def default(self, obj):
-        if hasattr(obj, '__dataclass_fields__'):
+        if hasattr(obj, "__dataclass_fields__"):
             return asdict(obj)
         return super().default(obj)
 
+
 def dc_dumps(obj):
     return json.dumps(obj, cls=DataclassEncoder)
+
 
 class User(Model):
     id = fields.BigIntField(pk=True, generated=True)
@@ -29,10 +32,11 @@ class User(Model):
     created_at = fields.DatetimeField(auto_now_add=True)
 
     def __repr__(self):
-        return f'User<{self.spotify_id}>'
-    
+        return f"User<{self.spotify_id}>"
+
 
 # Dataclasses so we won't store the user's personal data :)
+
 
 @dataclass
 class Playlist:
@@ -61,6 +65,7 @@ class Artist:
     followers: int | None = None
     genres: List[str] | None = None
 
+
 @dataclass
 class Album:
     id: str
@@ -68,6 +73,7 @@ class Album:
     name: str | None = None
     artists: List[Artist] | None = None
     image: str | None = None
+
 
 @dataclass
 class Track:
@@ -81,9 +87,8 @@ class Track:
     uri: str
     preview_url: str | None = None
 
+
 @dataclass
 class PlaylistTrack(Track):
     added_at: str | None = None
     added_by: str | None = None
-
-
