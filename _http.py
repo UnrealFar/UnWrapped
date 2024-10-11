@@ -318,7 +318,7 @@ class HTTP:
         tracks = []
         for item in data["items"]:
             try:
-                img_url = item["track"]["album"]["images"][0]["url"]
+                img_url = item["album"]["images"][0]["url"]
             except IndexError:
                 img_url = None
             track = Track(
