@@ -7,6 +7,8 @@ import datetime
 import pytz
 import tortoise
 import logging
+import asyncio
+
 from models import (
     User,
     Playlist,
@@ -18,15 +20,23 @@ from models import (
 if TYPE_CHECKING:
     from main import Client
 
+
 class HTTP:
     client: Client
     session: aiohttp.ClientSession
+    _global_semaphore: asyncio.Semaphore
+    _user_locks: Dict[str, asyncio.Lock]
+    _user_rate_limits: Dict[str, int]
     
+
     def __init__(self, client: Client):
         self.client = client
         self.session = None
-        
         self.user_playlists: Dict[str, List[Playlist]] = {}
+
+        self._global_semaphore = asyncio.Semaphore(10)
+        self._user_locks = {}
+        self._user_rate_limits = {}
 
     async def setup(self):
         self.session = aiohttp.ClientSession()
@@ -35,16 +45,45 @@ class HTTP:
         if self.session:
             await self.session.close()
 
+    async def _get_user_lock(self, user_id: str) -> asyncio.Lock:
+        """Get or create a lock for each user to handle rate limits."""
+        if user_id not in self._user_locks:
+            self._user_locks[user_id] = asyncio.Lock()
+        return self._user_locks[user_id]
 
-    async def request(self, method, url, **kwargs):
+    async def request(self, method, url, user_id=None, **kwargs):
         if not self.session:
             self.session = aiohttp.ClientSession()
+
+        async with self._global_semaphore:
+            if user_id:
+                async with await self._get_user_lock(user_id):
+                    return await self._make_request_with_retry(method, url, user_id, **kwargs)
+            else:
+                return await self._make_request_with_retry(method, url, user_id, **kwargs)
+
+    async def _make_request_with_retry(self, method, url, user_id=None, **kwargs):
+        retry_after = self._user_rate_limits.get(user_id, 0)
+        if retry_after:
+            logging.warning(f"User {user_id} is rate limited. Retrying after {retry_after} seconds...")
+            await asyncio.sleep(retry_after)
+
         async with self.session.request(method, url, **kwargs) as response:
+            if response.status == 429:
+                retry_after = int(response.headers.get("Retry-After", 1))
+                logging.warning(f"Rate limit hit for user {user_id}, retrying after {retry_after} seconds...")
+                self._user_rate_limits[user_id] = retry_after
+                await asyncio.sleep(retry_after)
+                return await self._make_request_with_retry(method, url, user_id, **kwargs)
+
+            if response.status >= 400:
+                raise Exception(f"HTTP Error: {response.status}, {await response.text()}")
+
+            self._user_rate_limits[user_id] = 0
             try:
                 return await response.json()
             except aiohttp.ContentTypeError:
                 raise Exception(await response.text())
-
 
     async def refresh_token(self, user) -> None:
         url = "https://accounts.spotify.com/api/token"
@@ -81,7 +120,7 @@ class HTTP:
         )
         access_token = data["access_token"]
         token_type = data["token_type"]
-        
+
         url = "https://api.spotify.com/v1/me"
         user_data = await self.request(
             "GET",
@@ -96,7 +135,7 @@ class HTTP:
         access_token = token_data["access_token"]
         expires_in = token_data["expires_in"]
         refresh_token = token_data["refresh_token"]
-        
+
         try:
             user = await User.get(spotify_id=user_data["id"])
         except tortoise.exceptions.DoesNotExist:
@@ -245,4 +284,8 @@ class HTTP:
         return artists
 
     async def close(self):
-        await self.session.close()
+        if self.session:
+            await self.session.close()
+
+
+
