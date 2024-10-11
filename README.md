@@ -42,19 +42,14 @@ UnWrapped is a FastAPI application that allows users to get their Spotify Wrappe
     Create a `.env` file in the root directory and add the following variables:
 
     ```env
-    CLIENT_ID=your_spotify_client_id
-    CLIENT_SECRET=your_spotify_client_secret
-    REDIRECT_URI=http://localhost:8000/callback
-    SECRET_KEY=your_secret_key
-    SECRET_SALT=your_secret_salt
-    POSTGRES_URL=postgres://user:password@localhost:5432/database
+    CLIENT_ID=""
+    CLIENT_SECRET=""
+    REDIRECT_URI=""
+    POSTGRES_URL=""
+    SECRET_KEY=""
+    SECRET_SALT=""
     ```
 
-5. Initialize the database:
-
-    ```bash
-    tortoise-orm init --config tortoise_config.json
-    ```
 
 ## Running the Application
 
@@ -111,13 +106,6 @@ Logging is configured to output debug information to the console.
 To deploy the application, you can use any ASGI-compatible server such as Daphne, Uvicorn, or Hypercorn. Make sure to set the environment variables and configure the database connection appropriately.
 The structure of .env is given in [example](example.env)
 
-Run the program with:
-
-```bash
-uvicorn main:app --host PORT --port PORT
-OR
-python -m uvicorn main:app --host HOST --port PORT
-```
 
 ## License
 
