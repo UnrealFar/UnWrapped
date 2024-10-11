@@ -193,7 +193,7 @@ async def favicon():
 async def profile(request: Request, user: User = get_user):
     if not user:
         return RedirectResponse("/login")
-    return templates.TemplateResponse("profile.html", {"request": request})
+    return templates.TemplateResponse("profile.html", {"request": request, "user": user})
 
 
 @app.get("/playlists")

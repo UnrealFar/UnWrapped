@@ -145,6 +145,10 @@ class HTTP:
         try:
             user = await User.get(spotify_id=user_data["id"])
         except tortoise.exceptions.DoesNotExist:
+            try:
+                img_url = user_data["images"][0]["url"],
+            except IndexError:
+                img_url = None
             user = User(
                 spotify_id=user_data["id"],
                 access_token=access_token,
@@ -154,7 +158,7 @@ class HTTP:
                 display_name=user_data["display_name"],
                 email=user_data["email"],
                 uri=user_data["uri"],
-                image=user_data["images"][0]["url"],
+                image=img_url,
                 country=user_data["country"],
                 product=user_data["product"],
                 key=bcrypt.hashpw(user_data["id"].encode(), bcrypt.gensalt()).decode(),
@@ -192,13 +196,17 @@ class HTTP:
 
         playlists = []
         for item in data["items"]:
+            try:
+                img_url = item["images"][0]["url"]
+            except IndexError:
+                img_url = None
             playlist = Playlist(
                 id=item["id"],
                 name=item["name"],
                 collaborative=item["collaborative"],
                 description=item["description"],
                 href=item["href"],
-                image=item["images"][0]["url"],
+                image=img_url,
                 owner_id=item["owner"]["id"],
                 owner_name=item["owner"]["display_name"],
                 public=item["public"],
@@ -223,13 +231,17 @@ class HTTP:
                 "fields": "id,name,description,href,images,owner,public,snapshot_id,collaborative,tracks(total,href)",
             },
         )
+        try:
+            img_url = data["images"][0]["url"]
+        except IndexError:
+            img_url = None
         playlist = Playlist(
             id=data["id"],
             name=data["name"],
             collaborative=data["collaborative"],
             description=data["description"],
             href=data["href"],
-            image=data["images"][0]["url"],
+            image=img_url
             owner_id=data["owner"]["id"],
             owner_name=data["owner"]["display_name"],
             public=data["public"],
@@ -256,6 +268,10 @@ class HTTP:
         )
         tracks = []
         for item in data["items"]:
+            try:
+                img_url = item["track"]["album"]["images"][0]["url"]
+            except IndexError:
+                img_url = None
             track = PlaylistTrack(
                 added_at=item["added_at"],
                 added_by=item["added_by"]["id"],
@@ -272,7 +288,7 @@ class HTTP:
                         Artist(id=artist["id"], name=artist["name"], uri=artist["uri"])
                         for artist in item["track"]["album"]["artists"]
                     ],
-                    image=item["track"]["album"]["images"][0]["url"],
+                    image=img_url,
                     uri=item["track"]["album"]["uri"],
                 ),
                 duration_ms=item["track"]["duration_ms"],
@@ -301,6 +317,10 @@ class HTTP:
         )
         tracks = []
         for item in data["items"]:
+            try:
+                img_url = item["track"]["album"]["images"][0]["url"]
+            except IndexError:
+                img_url = None
             track = Track(
                 id=item["id"],
                 name=item["name"],
@@ -315,7 +335,7 @@ class HTTP:
                         Artist(id=artist["id"], name=artist["name"], uri=artist["uri"])
                         for artist in item["album"]["artists"]
                     ],
-                    image=item["album"]["images"][0]["url"],
+                    image=img_url,
                     uri=item["album"]["uri"],
                 ),
                 duration_ms=item["duration_ms"],
@@ -344,11 +364,15 @@ class HTTP:
         )
         artists = []
         for item in data["items"]:
+            try:
+                img_url = item["images"][0]["url"]
+            except IndexError:
+                img_url = None
             artist = Artist(
                 id=item["id"],
                 name=item["name"],
                 uri=item["uri"],
-                image=item["images"][0]["url"],
+                image=img_url,
                 popularity=item["popularity"],
                 followers=item["followers"]["total"],
                 genres=item["genres"],
