@@ -19,4 +19,20 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("spProfileUrl").onclick = function() {window.open(url);};
 
 
+    const profileImage = document.getElementById('profileImage');
+    const profileCard = document.getElementsByClassName('card')[0];
+    const colorThief = new ColorThief();
+
+    profileImage.crossOrigin = 'Anonymous';
+    profileImage.onload = () => {
+        const color = colorThief.getColor(profileImage);
+        const tdcolor = color.map(channel => Math.floor(channel * 0.7 + 255 * 0.3));
+        const tdcolorRgb = `rgb(${tdcolor[0]}, ${tdcolor[1]}, ${tdcolor[2]})`;
+        profileCard.style.background = `linear-gradient(to bottom, ${tdcolorRgb} 60%, black)`;
+    };
+
+    if (profileImage.complete) {
+        profileImage.onload()
+    }
+
 });

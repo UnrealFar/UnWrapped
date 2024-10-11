@@ -202,9 +202,10 @@ button:hover {
 
     #navbar #homeButton {
         align-self: center;
-        height: 90px;
+        height: 100px;
         width: 140px;
     }
+
 
     #navbar #navButtons {
         margin-left: 0;
