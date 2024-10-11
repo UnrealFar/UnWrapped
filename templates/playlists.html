@@ -4,20 +4,145 @@
     <title>UnWrapped | Playlists</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="og:title" content="UnWrapped | Get your Spotify wrapped and stats!">
-    <meta name="og:description" content="Get your spotify wrapped and other stats at any time of the year.">
+    <meta name="og:title" content="UnWrapped | Your Playlists!">
+    <meta name="og:description" content="Get your top playlists.">
     <meta name="og:url" content="https://unwrapped.onrender.com/playlists">
     <meta name="og:image" content="https://unwrapped.onrender.com/static/logo/LogoRectangle.png">
-    <meta name="keywords" content="spotify, wrapped, stats, music, top tracks, top artists">
+    <meta name="keywords" content="spotify, wrapped, stats, music, playlists, top playlists">
     <meta name="author" content="Farhan Ahmed">
     <meta name="robots" content="index, follow">
     <meta name="googlebot" content="index, follow">
     <meta name="bingbot" content="index, follow">
     <meta name="theme-color" content="#1DB954">
     <link rel="stylesheet" type="text/css" href="static/css/main.css">
+    <link rel="stylesheet" type="text/css" href="static/css/top.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script> 
 </head>
 <body>
     <nav></nav>
+    <h1>Your Playlists</h1>
+
+
+    <div id="cardColumn"></div>
+    <button id="loadMoreButton">Load More...</button>
+    <br><br><br><br><br>
+
     <script src="static/js/main.js"></script>
+    <script>
+        let page = 0;
+        let isLoading = false;
+        const cardColumn = document.getElementById('cardColumn');
+        const loadMoreButton = document.getElementById('loadMoreButton');
+        const colorThief = new ColorThief();
+    
+        function cacheData(key, data) {
+            const cache = {
+                timestamp: Date.now(),
+                data: data
+            };
+            localStorage.setItem(key, JSON.stringify(cache));
+        }
+    
+        function getCachedData(key) {
+            const cache = JSON.parse(localStorage.getItem(key));
+            if (cache && (Date.now() - cache.timestamp < 300000)) { // 5 minutes = 300000 milliseconds
+                return cache.data;
+            }
+            return null;
+        }
+    
+        async function loadMorePlaylists() {
+            if (isLoading) return;
+            isLoading = true;
+            const cacheKey = `playlists_page_${page}`;
+            const cachedData = getCachedData(cacheKey);
+    
+            if (cachedData) {
+                appendPlaylists(cachedData);
+                isLoading = false;
+            } else {
+                try {
+                    const response = await fetch(`/load_more_playlists?page=${page}`);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const data = await response.json();
+                    if (data.playlists) {
+                        const parsedPlaylists = data.playlists.map(playlist => JSON.parse(playlist));
+                        cacheData(cacheKey, parsedPlaylists);
+                        appendPlaylists(parsedPlaylists);
+                    } else {
+                        console.error('No playlists found in response:', data);
+                    }
+                } catch (error) {
+                    console.error('Error loading more playlists:', error);
+                } finally {
+                    isLoading = false;
+                }
+            }
+            page++;
+        }
+    
+        function appendPlaylists(playlists) {
+            playlists.forEach((playlist, index) => {
+                const playlistImage = playlist.image || 'default_image_url';
+                console.log(playlist);
+                const spotifyUrl = `https://open.spotify.com/playlist/${playlist.id}`;
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.id = `card${page * 20 + index + 1}`;
+                card.innerHTML = `
+                    <h2>#${page * 20 + index + 1} <img src="${playlistImage}" alt="${playlist.name}" class="cardImage" loading="lazy"></h2> 
+                    <span class="cardSpan">
+                        <h3 class="cardName">
+                            <a href="${spotifyUrl}" target="_blank">${playlist.name}</a>
+                            <button class="spotifyButton" onclick="window.open('${spotifyUrl}')"></button>
+                        </h3>
+                        <p>Tracks: ${playlist.track_count}</p>
+                    </span>
+                `;
+    
+                const imgCacheKey = `playlistImage_${playlist.id}`;
+                const cachedImage = getCachedData(imgCacheKey);
+    
+                if (cachedImage) {
+                    applyImageColor(cachedImage, card);
+                } else {
+                    const img = new Image();
+                    img.crossOrigin = 'Anonymous';
+                    img.src = playlistImage;
+                    img.onload = () => {
+                        const color = colorThief.getColor(img);
+                        cacheData(imgCacheKey, color);
+                        applyImageColor(color, card);
+                    };
+                }
+    
+                cardColumn.appendChild(card);
+            });
+        }
+    
+        function applyImageColor(color, card) {
+            const tdcolor = color.map(channel => Math.floor(channel * 0.7 + 255 * 0.3));
+            const tdcolorRgb = `rgb(${tdcolor[0]}, ${tdcolor[1]}, ${tdcolor[2]})`;
+            const originalColorRgb = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+    
+            card.style.background = `linear-gradient(to bottom, ${tdcolorRgb} 30%, black 100%)`;
+            card.style.borderColor = originalColorRgb;
+    
+            const luminance = (0.299 * tdcolor[0] + 0.587 * tdcolor[1] + 0.114 * tdcolor[2]) / 255;
+            if (luminance > 0.7) {
+                card.style.color = 'black';
+            } else {
+                card.style.color = 'white';
+            }
+        }
+    
+        loadMoreButton.addEventListener('click', () => {
+            loadMorePlaylists();
+        });
+    
+        loadMorePlaylists();
+    </script>
 </body>
 </html>

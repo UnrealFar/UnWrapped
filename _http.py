@@ -178,17 +178,6 @@ class HTTP:
                 "offset": offset,
             },
         )
-        next_url = data["next"]
-        while next_url:
-            next_data = await self.request(
-                "GET",
-                next_url,
-                headers={
-                    "Authorization": f"Bearer {user.access_token}",
-                },
-            )
-            data["items"].extend(next_data["items"])
-            next_url = next_data["next"]
 
         playlists = []
         for item in data["items"]:
@@ -198,13 +187,12 @@ class HTTP:
                 collaborative=item["collaborative"],
                 description=item["description"],
                 href=item["href"],
-                images=[image["url"] for image in item["images"]],
+                image=item["images"][0]["url"],
                 owner=item["owner"]["id"],
                 public=item["public"],
                 snapshot_id=item["snapshot_id"],
-                tracks=[track["track"]["id"] for track in item["tracks"]["items"]],
+                track_href=item["tracks"]["href"],
                 track_count=item["tracks"]["total"],
-                uri=item["uri"],
             )
             playlists.append(playlist)
         self.user_playlists[user.spotify_id] = playlists

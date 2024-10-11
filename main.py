@@ -186,28 +186,21 @@ async def profile(request: Request, user: User = get_user):
     )
 
 @app.get("/playlists")
-async def playlists(request: Request, refresh: bool = False, user: User = get_user):
-    return "Not implemented yet"
+async def playlists(request: Request, user: User = get_user):
     if not user:
         return RedirectResponse("/login")
-    if refresh or not client.http.user_playlists:
-        playlists = await client.http.get_playlists(user, offset=0, limit=20)
-        client.http.user_playlists[user.spotify_id] = playlists 
-    else:
-        playlists = client.http.user_playlists[user.spotify_id]
     return templates.TemplateResponse(
         "playlists.html", {"request": request}
     )
 
 @app.get("/load_more_playlists")
-async def load_more_playlists(request: Request, offset: int, user: User = get_user):
+async def load_more_playlists(request: Request, page: int, user: User = get_user):
+    offset = page * 20
     if not user:
         return RedirectResponse("/login")
-    playlists = await client.http.get_playlists(user, offset=offset, limit=20)
-    client.http.user_playlists[user.spotify_id].extend(playlists)
-    return templates.TemplateResponse(
-        "playlists.html", {"request": request, "playlists": playlists}
-    )
+    playlists = await client.http.get_user_playlists(user, offset=offset, limit=20)
+    playlists = [dc_dumps(playlist) for playlist in playlists]
+    return JSONResponse({"playlists": playlists})
 
 @app.get("/toptracks")
 async def top_tracks(request: Request, type: str = "short_term", user: User = get_user):

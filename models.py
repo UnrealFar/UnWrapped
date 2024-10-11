@@ -41,13 +41,13 @@ class Playlist:
     collaborative: bool
     description: str
     href: str
-    images: List[str]
     owner: str
     public: bool
     snapshot_id: str
-    tracks: List[str]
+    track_href: str
     track_count: int
-    uri: str
+    image: str | None = None
+    tracks: List[str] | None = None
 
 
 @dataclass
