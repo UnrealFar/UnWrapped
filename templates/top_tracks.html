@@ -105,12 +105,13 @@
         function appendTracks(tracks) {
             tracks.forEach((track, index) => {
                 const albumImage = track.album?.image || 'default_image_url';
-                const artistNames = track.artists?.map(artist => `<a href="https://open.spotify.com/artist/${artist.id}" target="_blank">${artist.name}</a>`).join(', ') || 'Unknown Artist';
+                const artistNames = track.artists?.map(artist => `<a href="https://open.spotify.com/artist/${artist.id}">${artist.name}</a>`).join(', ') || 'Unknown Artist';
                 const albumName = track.album ? `<a href="https://open.spotify.com/album/${track.album.id}" target="_blank">${track.album.name}</a>` : 'Unknown Album';
                 const spotifyUrl = `https://open.spotify.com/track/${track.id}`;
+                const trackUrl = `/track?track_id=${track.id}`;
                 const card = document.createElement('div');
                 card.onclick = function() {
-                    window.open(spotifyUrl);
+                    window.location.href = trackUrl;
                 };
                 card.className = 'card';
                 card.id = `card${page * 20 + index + 1}`;
@@ -120,7 +121,7 @@
                     <h2>#${page * 20 + index + 1} <img src="${albumImage}" alt="${track.name}" class="cardImage" loading="lazy"></h2> 
                     <span class="cardSpan">
                         <h3 class="cardName">
-                            <a href="${spotifyUrl}" target="_blank">${track.name}</a>
+                            <a href="${trackUrl}" target="_blank">${track.name}</a>
                             <button class="spotifyButton" onclick="window.open('${spotifyUrl}')"></button>
                         </h3>
                         <p>${artistNames}</p>

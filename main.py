@@ -278,6 +278,13 @@ async def load_more_topartists(
     artists.sort(key=lambda x: x.popularity, reverse=True)
     return JSONResponse({"artists": [dc_dumps(artist) for artist in artists]})
 
+@app.get("/track")
+async def track(request: Request, track_id: str, user: User = get_user):
+    if not user:
+        return RedirectResponse("/login")
+    track = await client.http.get_track(user, track_id)
+    return templates.TemplateResponse("track.html", {"request": request, "track": track})
+
 
 @app.get("/login")
 async def login(

@@ -380,6 +380,43 @@ class HTTP:
             artists.append(artist)
         return artists
 
+    async def get_track(self, user: User, track_id: str) -> Track:
+        url = f"https://api.spotify.com/v1/tracks/{track_id}"
+        data = await self.request(
+            "GET",
+            url,
+            headers={
+                "Authorization": f"Bearer {user.access_token}",
+            },
+        )
+        try:
+            img_url = data["album"]["images"][0]["url"]
+        except IndexError:
+            img_url = None
+        track = Track(
+            id=data["id"],
+            name=data["name"],
+            artists=[
+                Artist(id=artist["id"], name=artist["name"], uri=artist["uri"])
+                for artist in data["artists"]
+            ],
+            album=Album(
+                id=data["album"]["id"],
+                name=data["album"]["name"],
+                artists=[
+                    Artist(id=artist["id"], name=artist["name"], uri=artist["uri"])
+                    for artist in data["album"]["artists"]
+                ],
+                image=img_url,
+                uri=data["album"]["uri"],
+            ),
+            duration_ms=data["duration_ms"],
+            popularity=data["popularity"],
+            explicit=data["explicit"],
+            uri=data["uri"],
+        )
+        return track
+
     async def close(self):
         if self.session:
             await self.session.close()

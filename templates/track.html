@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <title>UnWrapped | Track Details</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="og:title" content="UnWrapped | Track Details">
+    <meta name="og:description" content="View details of your selected track.">
+    <meta name="og:url" content="https://unwrapped.onrender.com/track">
+    <meta name="og:image" content="https://unwrapped.onrender.com/static/logo/LogoRectangle.png">
+    <meta name="keywords" content="spotify, wrapped, stats, music, track details">
+    <meta name="author" content="Farhan Ahmed">
+    <meta name="robots" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+    <meta name="theme-color" content="#1DB954">
+    <link rel="stylesheet" type="text/css" href="static/css/main.css">
+    <link rel="stylesheet" type="text/css" href="static/css/track.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
+</head>
+<body>
+    <nav></nav>
+    <div id="trackHeader" class="track-header">
+        <br><br>
+        <img id="trackImage" src="{{ track.album.image }}" alt="Track Image" class="track-image">
+        <h1 id="trackName">{{ track.name }}</h1>
+        <h2>By: {% for artist in track.artists %}<a href="https://open.spotify.com/artist/{{ artist.id }}">{{ artist.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</h2>
+        <p>Album: <a href="https://open.spotify.com/album/{{ track.album.id }}" target="_blank">{{ track.album.name }}</a></p>
+        <p>Duration: {{ (track.duration_ms // 60000) }}:{{ '{:02d}'.format((track.duration_ms % 60000) // 1000) }}</p>
+        <p><a href="https://open.spotify.com/track/{{ track.id }}" target="_blank">Listen on Spotify</a></p>
+        <br><br>
+    </div>
+
+    <div id="trackDetails" class="track-details">
+        <h3>Track Details</h3>
+        <p>{{ track.description }}</p>
+    </div>
+
+    <script src="static/js/main.js"></script>
+    <script>
+        const trackImage = document.getElementById('trackImage');
+        const trackHeader = document.getElementById('trackHeader');
+        const colorThief = new ColorThief();
+
+        trackImage.crossOrigin = 'Anonymous';
+        trackImage.onload = () => {
+            const color = colorThief.getColor(trackImage);
+            const tdcolor = color.map(channel => Math.floor(channel * 0.7 + 255 * 0.3));
+            const tdcolorRgb = `rgb(${tdcolor[0]}, ${tdcolor[1]}, ${tdcolor[2]})`;
+            trackHeader.style.background = `linear-gradient(to bottom, ${tdcolorRgb}, black)`;
+        };
+
+        // If the image is already loaded (from cache), trigger the onload event manually
+        if (trackImage.complete) {
+            trackImage.onload();
+        }
+    </script>
+</body>
+</html>
