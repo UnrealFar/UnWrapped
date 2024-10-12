@@ -1,0 +1,66 @@
+html, body {
+    background: linear-gradient(to bottom, rgb(98, 73, 73) 10%, #1d1d1d 100%);
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+}
+
+a:hover {
+    color: #101010;
+}
+
+.cardHolder {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+    z-index: 5;
+}
+
+.trackCard {
+    border-radius: 10px;
+    padding: 20px;
+    margin: 10px;
+    text-align: center;
+    width: 500px;
+    border: 2px solid white;    
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.trackCard:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    transform: scale(1.05);
+    transition: 0.2s;
+}
+
+.trackCard img {
+    max-width: 200px;
+    height: auto;
+    border-radius: 4px;
+}
+
+.trackCard img:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    transform: scale(1.05);
+    transition: 0.1s;
+}
+
+
+
+@media (max-width: 600px) {
+
+
+    .trackCard {
+        width: 300px;
+    }
+
+    img {
+        max-width: 150px;
+    }
+
+}

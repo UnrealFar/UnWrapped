@@ -67,6 +67,7 @@ html, body {
     font-size: 1.5em;
 }
 
+
 .card h3 {
     margin-left: 10px;
     margin-right: 10px;
@@ -89,6 +90,8 @@ html, body {
     color: #b0b0b0;
     font-size: 1.1em;
 }
+
+
 
 #timeRangeSelect {
     background-color: #200000;
@@ -115,24 +118,7 @@ html, body {
     border-color: #14833b;
 }
 
-/* Spotify button */
-.spotifyButton {
-    background: black;
-    background-image: url('/spotify_logo');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    padding: 0;
-    border: none;
-    margin: 0;
-    width: 70px;
-    height: 25px;
-    border-radius: 10px;
-}
 
-.spotifyButton:hover {
-    background-color: black;
-}
 
 @media (max-width: 600px) {
     #cardColumn {

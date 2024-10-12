@@ -172,14 +172,22 @@ button:hover {
     display: block;
 }
 
-#footer {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    background-color: #111;
-    color: white;
-    text-align: center;
-    padding: 10px 0;
+.spotifyButton {
+    background: black;
+    background-image: url('/spotify_logo');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding: 0;
+    border: none;
+    margin: 0;
+    width: 70px;
+    height: 25px;
+    border-radius: 10px;
+}
+
+.spotifyButton:hover {
+    background-color: black;
 }
     
 /* Footer styles */

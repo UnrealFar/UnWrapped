@@ -90,6 +90,9 @@
                 const spotifyUrl = `https://open.spotify.com/playlist/${playlist.id}`;
                 const playlistUrl = `/playlist?playlist_id=${playlist.id}`;
                 const card = document.createElement('div');
+                card.onclick = function() {
+                    window.location.href = playlistUrl;
+                };
                 card.className = 'card';
                 card.id = `card${page * 20 + index + 1}`;
                 card.innerHTML = `
