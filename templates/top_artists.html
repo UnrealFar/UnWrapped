@@ -107,6 +107,9 @@
                 const artistImage = artist.image || 'default_image_url';
                 const spotifyUrl = `https://open.spotify.com/artist/${artist.id}`;
                 const card = document.createElement('div');
+                card.onclick = function() {
+                    window.open(spotifyUrl);
+                };
                 card.className = 'card';
                 card.id = `card${page * 20 + index + 1}`;
     
