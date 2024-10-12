@@ -182,7 +182,7 @@ async def root(request: Request, user: User = get_user):
 
 @app.get("/favicon.ico")
 async def favicon():
-    file_path = f"static/logo/LogoCircle.png"
+    file_path = f"static/logo/IconCircle.png"
     headers = {
         # "Cache-Control": "public, max-age=31536000"
     }
