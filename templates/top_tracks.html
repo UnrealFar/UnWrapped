@@ -109,6 +109,9 @@
                 const albumName = track.album ? `<a href="https://open.spotify.com/album/${track.album.id}" target="_blank">${track.album.name}</a>` : 'Unknown Album';
                 const spotifyUrl = `https://open.spotify.com/track/${track.id}`;
                 const card = document.createElement('div');
+                card.onclick = function() {
+                    window.open(spotifyUrl);
+                };
                 card.className = 'card';
                 card.id = `card${page * 20 + index + 1}`;
                 const minutes = Math.floor(track.duration_ms / 60000);
